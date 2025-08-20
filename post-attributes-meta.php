@@ -19,19 +19,24 @@ class PostAttributesMeta {
     // 🔹 1. Register Meta
     function register_meta() {
         $fields = [
-            'rating'     => [ 'type' => 'integer', 'single' => true, 'default' => 0 ],
-            'difficulty' => [ 'type' => 'string',  'single' => true, 'default' => '' ],
-            'beauty'     => [ 'type' => 'integer', 'single' => true, 'default' => 0 ],
-            'duration_min'=>[ 'type' => 'integer', 'single' => true, 'default' => 0 ],
+            'rating'        => [ 'type' => 'integer', 'single' => true, 'default' => 0 ],
+            'difficulty'    => [ 'type' => 'string',  'single' => true, 'default' => '' ],
+            'beauty'        => [ 'type' => 'integer', 'single' => true, 'default' => 0 ],
+            'duration_min'  => [ 'type' => 'integer', 'single' => true, 'default' => 0 ],
         ];
-        foreach ( $fields as $key => $args ) {
-            register_post_meta( 'post', "pam_$key", array_merge( $args, [
-                'show_in_rest'      => true,
-                'sanitize_callback' => null,
-                'auth_callback'     => function( $allowed, $meta_key, $post_id ) {
-                    return current_user_can( 'edit_post', (int)$post_id );
-                },
-            ] ) );
+
+        foreach ( ['post','page'] as $ptype ) {
+            foreach ( $fields as $key => $args ) {
+                register_post_meta( $ptype, "pam_$key", array_merge( $args, [
+                    'show_in_rest'      => true,
+                    // Wenn du Sanitisierer hast, trag sie hier ein. Sonst NULL:
+                    'sanitize_callback' => null,
+                    // WICHTIG: korrekte Signatur => $post_id kommt garantiert an
+                    'auth_callback'     => function( $allowed, $meta_key, $post_id /* , $user_id, $cap, $caps */ ) {
+                        return current_user_can( 'edit_post', (int) $post_id );
+                    },
+                ]));
+            }
         }
     }
 
