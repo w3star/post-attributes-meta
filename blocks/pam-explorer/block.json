@@ -1,0 +1,18 @@
+{
+  "apiVersion": 3,
+  "name": "pam/explorer",
+  "title": "Zusatzinfos – Explorer (Dual Sliders)",
+  "description": "Filterbare Liste aller Beiträge (SSR) mit Dual-Slidern, Sortierung & Pagination.",
+  "category": "widgets",
+  "icon": "filter",
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ]
+  },
+  "editorScript": "pam-explorer-editor",
+  "style": "file:./style.css",
+  "viewScript": "file:./view.js"
+}
