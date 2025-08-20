@@ -29,16 +29,47 @@ class PAM_Explorer_v1101 {
 
     public function register_meta() {
         foreach ( ['post','page'] as $ptype ) {
-            foreach ( self::META as $key => $args ) {
-                register_post_meta( $ptype, "pam_$key", [
-                    'type'              => $args['type'],
-                    'single'            => $args['single'],
-                    'default'           => $args['default'],
-                    'show_in_rest'      => true,
-                    'sanitize_callback' => [ $this, 'sanitize_' . $key ],
-                    'auth_callback'     => function() { return current_user_can( 'edit_post', get_the_ID() ?: 0 ); },
-                ] );
-            }
+            register_post_meta( $ptype, 'pam_rating', [
+                'type'              => 'integer',
+                'single'            => true,
+                'default'           => 0,
+                'show_in_rest'      => true,
+                'sanitize_callback' => null,
+                // KORREKT: Post-ID kommt sicher an; prüfe edit_post-Recht des aktuellen Users
+                'auth_callback'     => function( $allowed, $meta_key, $post_id ) {
+                    return current_user_can( 'edit_post', (int) $post_id );
+                },
+            ]);
+            register_post_meta( $ptype, 'pam_difficulty', [
+                'type'              => 'string',
+                'single'            => true,
+                'default'           => '',
+                'show_in_rest'      => true,
+                'sanitize_callback' => null,
+                'auth_callback'     => function( $allowed, $meta_key, $post_id ) {
+                    return current_user_can( 'edit_post', (int) $post_id );
+                },
+            ]);
+            register_post_meta( $ptype, 'pam_beauty', [
+                'type'              => 'integer',
+                'single'            => true,
+                'default'           => 0,
+                'show_in_rest'      => true,
+                'sanitize_callback' => null,
+                'auth_callback'     => function( $allowed, $meta_key, $post_id ) {
+                    return current_user_can( 'edit_post', (int) $post_id );
+                },
+            ]);
+            register_post_meta( $ptype, 'pam_duration_min', [
+                'type'              => 'integer',
+                'single'            => true,
+                'default'           => 0,
+                'show_in_rest'      => true,
+                'sanitize_callback' => null,
+                'auth_callback'     => function( $allowed, $meta_key, $post_id ) {
+                    return current_user_can( 'edit_post', (int) $post_id );
+                },
+            ]);
         }
     }
 
