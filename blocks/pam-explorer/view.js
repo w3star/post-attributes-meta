@@ -80,19 +80,31 @@
         }
 
         // Pointer-Logik: aktiven Griff setzen, bevor der Browser draggt
-        wrap.addEventListener('pointerdown', function (ev) {
-          if (ev.target === a) { setActive('a'); return; }
-          if (ev.target === b) { setActive('b'); return; }
-          // Klick auf Track: näheren Griff aktivieren
-          if (track) {
-            var rect = track.getBoundingClientRect();
-            var pct = (ev.clientX - rect.left) / rect.width; pct = Math.min(1, Math.max(0, pct));
-            var val = min + Math.round(pct * (max - min));
-            var da = Math.abs(val - parseInt(a.value, 10));
-            var db = Math.abs(val - parseInt(b.value, 10));
-            setActive(da <= db ? 'a' : 'b');
+        wrap.addEventListener('pointerdown', function(ev){
+          // 1) Aktiven Griff bestimmen (direkt getroffen? sonst: näherer)
+          if (ev.target === a) { setActive('a'); }
+          else if (ev.target === b) { setActive('b'); }
+          else if (track) {
+            var rect=track.getBoundingClientRect();
+            var pct=(ev.clientX - rect.left)/rect.width; pct=Math.min(1, Math.max(0, pct));
+            var val=min + Math.round(pct*(max-min));
+            var da=Math.abs(val - parseInt(a.value,10));
+            var db=Math.abs(val - parseInt(b.value,10));
+            setActive( da <= db ? 'a' : 'b' );
           }
-        }, true);
+
+          // 2) Nicht-aktiven Griff für die Drag-Phase „durchlässig“ machen
+          if (active === 'a') { b.classList.add('pe-none'); a.classList.remove('pe-none'); }
+          else { a.classList.add('pe-none'); b.classList.remove('pe-none'); }
+
+          // 3) Beim Loslassen wieder herstellen
+          var up = function(){
+            a.classList.remove('pe-none'); b.classList.remove('pe-none');
+            window.removeEventListener('pointerup', up, true);
+          };
+          window.addEventListener('pointerup', up, true);
+        }, true); // capture = vor nativem Drag aktivieren
+
 
         // Fokus per Tastatur
         a.addEventListener('focusin', function () { setActive('a'); });
