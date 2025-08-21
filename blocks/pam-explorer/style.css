@@ -27,30 +27,27 @@
     cursor: pointer
 }
 
-/* Dual slider layout */
+/* Dual-Slider-Grundlage */
 .minmax {
     position: relative;
     height: 28px;
     display: flex;
-    align-items: center;
-    touch-action: none
+    align-items: center
 }
 
 .minmax input[type=range] {
     position: absolute;
-    left: 0;
-    right: 0;
     top: 0;
     bottom: 0;
-    width: 100%;
+    /* left/right werden von JS gesetzt, um die Klickflächen zu begrenzen */
     margin: 0;
+    width: auto;
     background: transparent;
     -webkit-appearance: none;
     appearance: none;
-    outline: 0
+    outline: 0;
+    pointer-events: auto;
 }
-
-/*.minmax input[type=range].inactive{pointer-events:none} */
 
 /* track */
 .minmax .track {
@@ -71,7 +68,7 @@
     pointer-events: none
 }
 
-/* thumb */
+/* Daumen sichtbar in allen Browsern */
 .minmax input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -82,7 +79,7 @@
     border: 2px solid #111;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
     cursor: pointer;
-    margin-top: -7px
+    margin-top: -7px;
 }
 
 .minmax input[type=range]::-moz-range-thumb {
@@ -92,7 +89,7 @@
     background: #fff;
     border: 2px solid #111;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
-    cursor: pointer
+    cursor: pointer;
 }
 
 .minmax input[type=range]::-ms-thumb {
@@ -102,10 +99,10 @@
     background: #fff;
     border: 2px solid #111;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
-    cursor: pointer
+    cursor: pointer;
 }
 
-/* hide native tracks */
+/* Native Tracks ausblenden */
 .minmax input[type=range]::-webkit-slider-runnable-track {
     background: transparent
 }
