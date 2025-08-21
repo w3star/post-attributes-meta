@@ -35,12 +35,27 @@ ready(function(){
       function draw(){
         var va = parseInt(a.value,10);
         var vb = parseInt(b.value,10);
+
+        var pctA = ((va - min) / (max - min)) * 100;
+        var pctB = ((vb - min) / (max - min)) * 100;
+
+        // Sichtbarer aktiver Bereich in der Füllleiste (optional, falls du .range hast)
         if (rangeEl) {
-          var pctA = ((va - min) / (max - min)) * 100;
-          var pctB = ((vb - min) / (max - min)) * 100;
           rangeEl.style.left  = pctA + '%';
           rangeEl.style.right = (100 - pctB) + '%';
+        } else if (track) {
+          track.style.background =
+            'linear-gradient(to right,#e5e5e5 '+pctA+'%,#111 '+pctA+'%,#111 '+pctB+'%,#e5e5e5 '+pctB+'%)';
         }
+
+        // 🔑 WICHTIG: Klickbare Bereiche beschneiden (damit „bis“ links NICHT mehr klickt)
+        var clipA = 'inset(0 ' + (100 - pctA) + '% 0 0)'; // 0..pctA klickbar
+        var clipB = 'inset(0 0 0 ' + pctB + '%)';         // pctB..100 klickbar
+
+        a.style.clipPath        = clipA;
+        a.style.webkitClipPath  = clipA; // Safari
+        b.style.clipPath        = clipB;
+        b.style.webkitClipPath  = clipB;
       }
 
       function clampActive(){
@@ -54,20 +69,19 @@ ready(function(){
 
       // 1) Wenn direkt auf einen Griff geklickt wird → genau dieser wird aktiv.
       wrap.addEventListener('pointerdown', function(ev){
-        if (ev.target === a) { setActive('a'); return; }
-        if (ev.target === b) { setActive('b'); return; }
+        // 👉 Nicht mehr nach ev.target unterscheiden — IMMER den näheren Griff wählen.
+        if (!track) return;
+        var rect = track.getBoundingClientRect();
+        var pct  = (ev.clientX - rect.left) / rect.width;
+        pct = Math.min(1, Math.max(0, pct));
+        var val  = min + Math.round(pct * (max - min));
 
-        // 2) Klick auf die Leiste: wähle den NÄHEREN Griff
-        if (track) {
-          var rect = track.getBoundingClientRect();
-          var pct  = (ev.clientX - rect.left) / rect.width;
-          pct = Math.min(1, Math.max(0, pct));
-          var val  = min + Math.round(pct * (max - min));
-          var da   = Math.abs(val - parseInt(a.value,10));
-          var db   = Math.abs(val - parseInt(b.value,10));
-          setActive(da <= db ? 'a' : 'b');
-        }
-      }, true); // capture, damit der aktive Griff feststeht bevor der Browser draggt
+        var da = Math.abs(val - parseInt(a.value,10));
+        var db = Math.abs(val - parseInt(b.value,10));
+
+        setActive( da <= db ? 'a' : 'b' );
+      }, true); // capture, damit die z-index-Änderung vor dem nativen Drag greift
+
 
       // Tastatur: Fokus setzt aktiven Griff
       a.addEventListener('focusin', function(){ setActive('a'); });
