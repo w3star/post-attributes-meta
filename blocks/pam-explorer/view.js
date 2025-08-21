@@ -14,70 +14,73 @@
         if (range && out) { range.addEventListener('input', function () { out.textContent = range.value; }); }
       });
 
-      form.querySelectorAll('.minmax').forEach(function (wrap) {
-        // Wir gehen davon aus: 1. input = von, 2. input = bis
-        var a = wrap.querySelector('input[type="range"]:nth-of-type(1)'); // von
-        var b = wrap.querySelector('input[type="range"]:nth-of-type(2)'); // bis
-        if (!a || !b) return;
+      form.querySelectorAll('.minmax').forEach(function(wrap){
+        // Robuste Zuordnung per Name (falls vorhanden), sonst per Reihenfolge:
+        var a = wrap.querySelector('input[name="diff_from_i"], input[name="dur_from"]') || wrap.querySelector('input[type="range"]:nth-of-type(1)'); // von
+        var b = wrap.querySelector('input[name="diff_to_i"],   input[name="dur_to"]')   || wrap.querySelector('input[type="range"]:nth-of-type(2)'); // bis
+        if(!a || !b) return;
 
-        var track = wrap.querySelector('.track');
+        var track   = wrap.querySelector('.track');
         var rangeEl = track ? track.querySelector('.range') : null;
 
-        var outA = form.querySelector('output[data-out="' + (a.name || '') + '"]');
-        var outB = form.querySelector('output[data-out="' + (b.name || '') + '"]');
-
-        var min = parseInt(a.min, 10), max = parseInt(a.max, 10);
-        var active = 'b'; // bis liegt oben
-
-        function setActive(which) {
+        var min = parseInt(a.min,10), max = parseInt(a.max,10);
+        var active = 'b'; // Standard: bis oben
+        function setActive(which){
           active = which;
-          if (which === 'a') { a.style.zIndex = 3; b.style.zIndex = 2; }
-          else { b.style.zIndex = 3; a.style.zIndex = 2; }
+          if(which==='a'){ a.style.zIndex=3; b.style.zIndex=2; }
+          else           { b.style.zIndex=3; a.style.zIndex=2; }
         }
 
-        function display(val, inputName) {
-          if (!inputName) return String(val);
-          if (inputName.indexOf('dur_') === 0) return fmtDur(val);
-          if (inputName.indexOf('diff_') === 0) return diffLabel(val);
-          return String(val);
-        }
-
-        function clampActive() {
-          var va = parseInt(a.value, 10);
-          var vb = parseInt(b.value, 10);
-          if (active === 'a' && va > vb) { a.value = vb; }
-          if (active === 'b' && vb < va) { b.value = va; }
-        }
-
-        function draw() {
-          var va = parseInt(a.value, 10);
-          var vb = parseInt(b.value, 10);
-
-          // Prozentpositionen
+        function draw(){
+          var va = parseInt(a.value,10);
+          var vb = parseInt(b.value,10);
           var pctA = ((va - min) / (max - min)) * 100;
           var pctB = ((vb - min) / (max - min)) * 100;
 
-          // Sichtbarer Bereich in der Bahn
           if (rangeEl) {
-            rangeEl.style.left = pctA + '%';
+            rangeEl.style.left  = pctA + '%';
             rangeEl.style.right = (100 - pctB) + '%';
           } else if (track) {
             track.style.background =
-              'linear-gradient(to right,#e5e5e5 ' + pctA + '%,#111 ' + pctA + '%,#111 ' + pctB + '%,#e5e5e5 ' + pctB + '%)';
+              'linear-gradient(to right,#e5e5e5 '+pctA+'%,#111 '+pctA+'%,#111 '+pctB+'%,#e5e5e5 '+pctB+'%)';
           }
-
-          // 🔑 Hier passiert die Magie:
-          //   - von-Input klickbar nur LINKS bis zum eigenen Griff
-          //   - bis-Input klickbar nur RECHTS ab eigenem Griff
-          a.style.left = '0%';
-          a.style.right = (100 - pctA) + '%'; // begrenzt die Breite nach rechts
-
-          b.style.left = pctB + '%';         // begrenzt die Breite nach links
-          b.style.right = '0%';
-
-          if (outA) outA.textContent = display(va, a.name);
-          if (outB) outB.textContent = display(vb, b.name);
         }
+
+        function clampActive(){
+          var va = parseInt(a.value,10);
+          var vb = parseInt(b.value,10);
+          if (active==='a' && va>vb){ a.value = vb; }
+          if (active==='b' && vb<va){ b.value = va; }
+          draw();
+        }
+
+        // Aktiven Griff vor dem nativen Drag festlegen
+        wrap.addEventListener('pointerdown', function(ev){
+          if (ev.target === a) { setActive('a'); }
+          else if (ev.target === b) { setActive('b'); }
+          else if (track) {
+            var rect=track.getBoundingClientRect();
+            var pct=(ev.clientX - rect.left)/rect.width; pct=Math.min(1, Math.max(0, pct));
+            var val=min + Math.round(pct*(max-min));
+            var da=Math.abs(val - parseInt(a.value,10));
+            var db=Math.abs(val - parseInt(b.value,10));
+            setActive( da <= db ? 'a' : 'b' );
+          }
+        }, true);
+
+        // Tastatur-Fokus
+        a.addEventListener('focusin', function(){ setActive('a'); });
+        b.addEventListener('focusin', function(){ setActive('b'); });
+
+        // Ziehen/Eingabe
+        a.addEventListener('input', function(){ setActive('a'); clampActive(); });
+        b.addEventListener('input', function(){ setActive('b'); clampActive(); });
+
+        // Initial (von <= bis)
+        if (parseInt(a.value,10) > parseInt(b.value,10)) { a.value = b.value; }
+        setActive('b');
+        draw();
+      });
 
         // Pointer-Logik: aktiven Griff setzen, bevor der Browser draggt
         wrap.addEventListener('pointerdown', function(ev){
