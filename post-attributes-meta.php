@@ -194,7 +194,7 @@ class PAM_Explorer_v1101
         register_block_type(__DIR__ . '/blocks/pam-explorer', [
             'editor_script'  => 'pam-explorer-editor',
             'style'          => 'pam-explorer-style',
-            'script'         => 'pam-explorer-view',
+            //'script'         => 'pam-explorer-view',
             'render_callback' => [$this, 'render_block_explorer'],
         ]);
     }
