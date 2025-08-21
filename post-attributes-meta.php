@@ -204,7 +204,7 @@ class PAM_Explorer_v1101
         wp_register_style('pam-summary-style', plugins_url('blocks/pam-summary/style.css', __FILE__), [], '1.10.1');
         wp_register_style('pam-stars-style', plugins_url('blocks/pam-stars/style.css', __FILE__), [], '1.10.1');
         wp_register_style('pam-explorer-style', plugins_url('blocks/pam-explorer/style.css', __FILE__), [], '1.10.1');
-        wp_register_script('pam-explorer-view', plugins_url('blocks/pam-explorer/view.js', __FILE__), [], '1.10.1', true);
+        //wp_register_script('pam-explorer-view', plugins_url('blocks/pam-explorer/view.js', __FILE__), [], '1.10.1', true);
     }
 
     // ---------- SVG ICONS ----------
