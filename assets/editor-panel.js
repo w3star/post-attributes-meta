@@ -20,18 +20,18 @@
     }, [meta]);
 
     function handleDifficulty(value){
-      setMeta('pam_difficulty', value);
+      setMeta('star_difficulty', value);
     }
 
     return el( PluginDocumentSettingPanel, { name:'pam-panel', title:'Zusatzinfos', className:'pam-panel' },
       el( NumberControl, {
         label: 'Rating (0–5)', min:0, max:5, step:1,
-        value: meta.pam_rating || 0,
-        onChange: v => setMeta('pam_rating', parseInt(v||0,10))
+        value: meta.star_rating || 0,
+        onChange: v => setMeta('star_rating', parseInt(v||0,10))
       } ),
       el( SelectControl, {
         label: 'Schwierigkeit',
-        value: meta.pam_difficulty || '',
+        value: meta.star_difficulty || '',
         options: [
           { label: '—', value: '' },
           { label: 'Leicht', value: 'easy' },
@@ -42,14 +42,14 @@
         __nextHasNoMarginBottom: true
       } ),
       el( NumberControl, {
-        label: 'Schönheit (0–5)', min:0, max:5, step:1,
-        value: meta.pam_beauty || 0,
-        onChange: v => setMeta('pam_beauty', parseInt(v||0,10))
+        label: 'Exklusivität (0–5)', min:0, max:5, step:1,
+        value: meta.star_exclusivity || 0,
+        onChange: v => setMeta('star_exclusivity', parseInt(v||0,10))
       } ),
       el( NumberControl, {
         label: 'Dauer (Minuten)', min:0, step:10,
-        value: meta.pam_duration_min || 0,
-        onChange: v => setMeta('pam_duration_min', parseInt(v||0,10))
+        value: meta.star_time_relaxed || 0,
+        onChange: v => setMeta('star_time_relaxed', parseInt(v||0,10))
       } )
     );
   }

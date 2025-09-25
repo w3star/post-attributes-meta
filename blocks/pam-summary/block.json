@@ -2,14 +2,14 @@
   "apiVersion": 3,
   "name": "pam/summary",
   "title": "Zusatzinfos – Karte",
-  "description": "Zeigt Rating, Schwierigkeit (Berge), Schönheit (Sonne), Dauer (Stoppuhr).",
+  "description": "Zeigt Rating, Schwierigkeit (Berge), Exklusivität (Sonne), Dauer (Stoppuhr).",
   "category": "widgets",
   "icon": "index-card",
   "keywords": [
     "Zusatzinfos",
-    "rating",
+    "star_rating",
     "schwierigkeit",
-    "schönheit",
+    "Exklusivität",
     "dauer"
   ],
   "supports": {
