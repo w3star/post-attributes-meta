@@ -77,7 +77,17 @@ class Outdoor_www
                         ['value' => 'medium', 'label' => 'Mittel'],
                         ['value' => 'hard',  'label' => 'Schwer'],
                     ]],
-                    ['key' => 'star_time_relaxed', 'type' => 'int',    'label' => 'Dauer (Minuten)', 'min' => 0, 'max' => 720, 'step' => 10],
+                ],
+            ],
+            [
+                'id'    => 'owww_time',
+                'title' => 'Outdoor www | Zeiten',
+                'fields' => [
+                    ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1],
+                    ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1],
+                    ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1],
+                    ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1],
+                    ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1],
                 ],
             ],
             // Beispiel für später:
