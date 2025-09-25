@@ -78,5 +78,4 @@
     }
 
     registerPlugin('pam-sidebar-panels', { render: PAMSidebar, icon: null });
-
 })(window.wp);
