@@ -51,13 +51,13 @@ class Outdoor_www
 
     public function __construct()
     {
-        add_action('init',                       [$this, 'register_meta']);
+        add_action('init',                        [$this, 'register_meta']);
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
-        add_action('add_meta_boxes',             [$this, 'add_classic_metabox']); // Fallback nur Classic
-        add_action('save_post',                  [$this, 'save_classic_metabox']); // Fallback nur Classic
-        add_action('init',                       [$this, 'register_block_scripts'], 9);
-        add_action('init',                       [$this, 'register_blocks'], 10);
-        add_action('wp_enqueue_scripts',         [$this, 'register_view_assets']);
+        add_action('add_meta_boxes',              [$this, 'add_classic_metabox']); // Fallback nur Classic
+        add_action('save_post',                   [$this, 'save_classic_metabox']); // Fallback nur Classic
+        add_action('init',                        [$this, 'register_block_scripts'], 9);
+        add_action('init',                        [$this, 'register_blocks'], 10);
+        add_action('wp_enqueue_scripts',          [$this, 'register_view_assets']);
     }
 
     /** ---------- Gutenberg-Bereiche konfigurieren (frei benennbar) ---------- */
@@ -133,12 +133,12 @@ class Outdoor_www
         wp_enqueue_script('owww-sidebar');
 
         // (Optional) Editor-Styles
-        wp_enqueue_style(
-            'owww-editor-css',
-            plugins_url('blocks/editor.css', __FILE__),
-            ['wp-edit-blocks'],
-            OUTDOOR_WWW_VERSION
-        );
+        // wp_enqueue_style(
+        //     'owww-editor-css',
+        //     plugins_url('blocks/editor.css', __FILE__),
+        //     ['wp-edit-blocks'],
+        //     OUTDOOR_WWW_VERSION
+        // );
     }
 
 

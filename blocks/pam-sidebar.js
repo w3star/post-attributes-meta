@@ -1,23 +1,31 @@
+/* blocks/pam-sidebar.js */
 (function (wp) {
-    const { registerPlugin } = wp.plugins;
-    const { PluginDocumentSettingPanel } = wp.editPost;
-    const { useSelect, useDispatch } = wp.data;
-    const { __ } = wp.i18n;
-    const { PanelRow, RangeControl, SelectControl, TextControl } = wp.components;
-    const { createElement: h, Fragment } = wp.element;
+    // Harte Guards + Debug
+    if (!wp) { console.error('[PAM] window.wp fehlt'); return; }
+    if (!wp.plugins || !wp.editPost || !wp.data || !wp.components || !wp.element) {
+        console.error('[PAM] Gutenberg Packages fehlen', { hasPlugins: !!wp.plugins, hasEditPost: !!wp.editPost });
+        return;
+    }
 
-    // Konfiguration kommt aus PHP via wp_localize_script -> PAM_SECTIONS (Array)
+    const { registerPlugin } = wp.plugins;
+    //const { PluginDocumentSettingPanel } = wp.editPost;
+    const { PluginDocumentSettingPanel } = wp.editor || wp.editPost;
+    const { useSelect, useDispatch } = wp.data;
+    const { PanelRow, RangeControl, SelectControl, TextControl, Notice } = wp.components;
+    const { createElement: h, Fragment, useMemo } = wp.element;
+
     const SECTIONS = Array.isArray(window.PAM_SECTIONS) ? window.PAM_SECTIONS : [];
+    console.log('[PAM] pam-sidebar.js boot', { sections: SECTIONS });
+
+    // Hilfs-Funktionen
+    const toInt = (v) => {
+        const n = parseInt(v, 10);
+        return isNaN(n) ? 0 : n;
+    };
 
     function FieldControl({ field, meta, editMeta }) {
         const key = field.key;
         const val = meta[key];
-
-        // einfache Normalisierer
-        const toInt = (v) => {
-            const n = parseInt(v, 10);
-            return isNaN(n) ? 0 : n;
-        };
 
         switch (field.type) {
             case 'int':
@@ -61,19 +69,31 @@
         const { editPost } = useDispatch('core/editor');
         const editMeta = (patch) => editPost({ meta: { ...meta, ...patch } });
 
+        const fields = section.fields || [];
         return h(PluginDocumentSettingPanel, { name: section.id, title: section.title, className: 'pam-section' },
             h(Fragment, {},
-                (section.fields || []).map(f =>
-                    h(FieldControl, { key: f.key, field: f, meta, editMeta })
-                )
+                fields.length
+                    ? fields.map(f => h(FieldControl, { key: f.key, field: f, meta, editMeta }))
+                    : h(Notice, { status: 'info', isDismissible: false }, 'Keine Felder konfiguriert.')
             )
         );
     }
 
     function PAMSidebar() {
+        const postType = useSelect((s) => s('core/editor').getCurrentPostType(), []);
+        const meta = useSelect((s) => s('core/editor').getEditedPostAttribute('meta') || {}, []);
+        console.log('[PAM] sidebar render', { postType, meta });
+
+        // Falls keine Sections geliefert wurden, zeige ein klar sichtbares Testpanel
         if (!SECTIONS.length) {
-            return h('div', { style: { padding: '8px', opacity: .7 } }, 'Keine PAM_SECTIONS definiert.');
+            return h(PluginDocumentSettingPanel, { name: 'pam_test', title: 'PAM Testpanel' },
+                h('div', null,
+                    'PAM_SECTIONS ist leer oder nicht gesetzt. ',
+                    'Prüfe wp_localize_script() → Handle "owww-sidebar".'
+                )
+            );
         }
+
         return h(Fragment, {}, SECTIONS.map(s => h(SectionPanel, { key: s.id, section: s })));
     }
 
