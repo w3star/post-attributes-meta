@@ -77,89 +77,11 @@ class Outdoor_www
 
         // OOP: Gutenberg-Sidebar + Sections
         new \OutdoorWww\Admin\Sidebar(\OutdoorWww\Admin\Sidebar::defaultSections());
+
+        // OOP: Blocks – Schritt 1: nur Summary in OOP
+        new \OutdoorWww\Blocks\Registrar();
     }
 
-
-
-    // /** ---------- Gutenberg-Bereiche konfigurieren (frei benennbar) ---------- */
-    // private function meta_sections_config(): array
-    // {
-    //     // 👉 Hier bestimmst du Titel & Felder deiner Bereiche. Du kannst das jederzeit erweitern.
-    //     return [
-    //         [
-    //             'id'    => 'owww_general',
-    //             'title' => 'Allgemein',
-    //             'fields' => [
-    //                 ['key' => 'star_rating',       'type' => 'int',    'label' => 'Rating',        'min' => 0, 'max' => 5, 'step' => 1, 'widget' => 'input'],
-    //                 ['key' => 'star_exclusivity',  'type' => 'int',    'label' => 'Exklusivität',  'min' => 0, 'max' => 5, 'step' => 1, 'widget' => 'input'],
-    //                 ['key' => 'star_difficulty',   'type' => 'select', 'label' => 'Schwierigkeit', 'options' => [
-    //                     ['value' => '',      'label' => '—'],
-    //                     ['value' => 'easy',  'label' => 'Leicht'],
-    //                     ['value' => 'medium', 'label' => 'Mittel'],
-    //                     ['value' => 'hard',  'label' => 'Schwer'],
-    //                 ]],
-    //             ],
-    //         ],
-    //         [
-    //             'id'    => 'owww_time',
-    //             'title' => 'Outdoor www | Zeiten',
-    //             'fields' => [
-    //                 ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-    //                 ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-    //                 ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-    //                 ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-    //                 ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-    //             ],
-    //         ],
-    //     ];
-    // }
-
-    // /** ----------------------------- META REGISTRIEREN ----------------------------- */
-    // public function register_meta()
-    // {
-    //     foreach (['post', 'page'] as $ptype) {
-    //         foreach (self::META as $meta_key => $args) {
-    //             register_post_meta($ptype, $meta_key, [
-    //                 'type'              => $args['type'],
-    //                 'single'            => $args['single'],
-    //                 'default'           => $args['default'],
-    //                 'show_in_rest'      => true, // ✅ nötig für Gutenberg-Panels
-    //                 'sanitize_callback' => null,
-    //                 'auth_callback'     => function ($allowed, $key, $post_id) {
-    //                     return current_user_can('edit_post', (int)$post_id);
-    //                 },
-    //             ]);
-    //         }
-    //     }
-    // }
-
-    // /** ------------------------- EDITOR-ASSETS (Gutenberg UI) ---------------------- */
-    // public function enqueue_editor_assets()
-    // {
-    //     // 1) Script registrieren (noch nicht enqueuen)
-    //     wp_register_script(
-    //         'owww-sidebar',
-    //         plugins_url('blocks/pam-sidebar.js', __FILE__),
-    //         // ❗ KORREKT: 'wp-plugins' (Plural!) + 'wp-editor' wird für den core/editor-Store benötigt
-    //         ['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-editor', 'wp-i18n'],
-    //         OUTDOOR_WWW_VERSION,
-    //         true
-    //     );
-
-    //     // 2) Konfiguration vor dem Enqueue injizieren
-    //     wp_localize_script('owww-sidebar', 'PAM_SECTIONS', $this->meta_sections_config());
-
-    //     // 3) Jetzt erst enqueuen
-    //     wp_enqueue_script('owww-sidebar');
-
-    //     // (Optional) Editor-Styles
-    //     wp_enqueue_style(
-    //         'owww-editor-css',
-    //         plugins_url('blocks/editor.css', __FILE__),
-    //         ['wp-edit-blocks'],
-    //         OUTDOOR_WWW_VERSION
-    //     );
-    // }
 
 
     /** ----------------------- CLASSIC EDITOR: Fallback-Metabox --------------------- */
@@ -238,13 +160,6 @@ class Outdoor_www
     public function register_block_scripts()
     {
         wp_register_script(
-            'pam-summary-editor',
-            plugins_url('blocks/pam-summary/index.js', __FILE__),
-            ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-data', 'wp-core-data', 'wp-i18n'],
-            OUTDOOR_WWW_VERSION,
-            true
-        );
-        wp_register_script(
             'pam-stars-editor',
             plugins_url('blocks/pam-stars/index.js', __FILE__),
             ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-data', 'wp-i18n'],
@@ -262,16 +177,12 @@ class Outdoor_www
 
     public function register_blocks()
     {
-        register_block_type(__DIR__ . '/blocks/pam-summary', [
-            'editor_script'   => 'pam-summary-editor',
-            'style'           => 'pam-summary-style',
-            'render_callback' => [$this, 'render_block_summary'],
-        ]);
         register_block_type(__DIR__ . '/blocks/pam-stars', [
             'editor_script'   => 'pam-stars-editor',
             'style'           => 'pam-stars-style',
             'render_callback' => [$this, 'render_block_stars'],
         ]);
+
         register_block_type(__DIR__ . '/blocks/pam-explorer', [
             'editor_script'   => 'pam-explorer-editor',
             'style'           => 'pam-explorer-style',
@@ -335,7 +246,7 @@ class Outdoor_www
     }
 
     /** ------------------------------ Block Renders ------------------------------- */
-    public function render_block_summary($attributes, $content, $block)
+    /*public function render_block_summary($attributes, $content, $block)
     {
         wp_enqueue_style('pam-summary-style');
         $post_id = $block->context['postId'] ?? get_the_ID();
@@ -363,7 +274,9 @@ class Outdoor_www
         </div>
     <?php
         return ob_get_clean();
-    }
+    }*/
+
+
 
     public function render_block_stars($attributes, $content, $block)
     {
