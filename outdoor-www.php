@@ -27,6 +27,7 @@
 
 if (!defined('ABSPATH')) exit;
 
+define('OUTDOOR_WWW_FILE', __FILE__); // zuverlässiger Verweis auf die Hauptdatei
 define('OUTDOOR_WWW_VERSION', '1.1.0');
 define('OUTDOOR_WWW_PATH', plugin_dir_path(__FILE__));
 define('OUTDOOR_WWW_URL',  plugin_dir_url(__FILE__));
@@ -624,7 +625,15 @@ class Outdoor_www
 
 new Outdoor_www();
 
-// --- Lifecycle: Aktivieren/Deaktivieren/Deinstallieren ---
-register_activation_hook(__FILE__,   ['Outdoor-Www\\Core\\Lifecycle', 'activate']);
-register_deactivation_hook(__FILE__, ['Outdoor-Www\\Core\\Lifecycle', 'deactivate']);
-register_uninstall_hook(__FILE__,    ['Outdoor-Www\\Core\\Lifecycle', 'uninstall']);
+// --- Lifecycle-Hooks: Klasse beim Aufruf explizit laden ---
+register_activation_hook(__FILE__, function () {
+    require_once __DIR__ . '/src/Core/Lifecycle.php';
+    OutdoorWww\Core\Lifecycle::activate();
+});
+
+register_deactivation_hook(__FILE__, function () {
+    require_once __DIR__ . '/src/Core/Lifecycle.php';
+    OutdoorWww\Core\Lifecycle::deactivate();
+});
+
+

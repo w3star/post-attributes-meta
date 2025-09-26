@@ -18,7 +18,9 @@ class Lifecycle
     {
         // 1) Mindestanforderungen prüfen
         if (version_compare(PHP_VERSION, self::MIN_PHP, '<')) {
-            deactivate_plugins(plugin_basename(dirname(__DIR__, 2) . '/outdoor-www.php'));
+            if (defined('OUTDOOR_WWW_FILE')) {
+                deactivate_plugins(plugin_basename(OUTDOOR_WWW_FILE));
+            }
             wp_die(
                 sprintf(
                     'Dieses Plugin benötigt PHP %s oder höher. Aktuell: %s.',
