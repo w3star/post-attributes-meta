@@ -89,12 +89,12 @@ class Sidebar
                         'type' => 'select',
                         'label' => 'phys. Anforderungen',
                         'options' => [
-                            ['value' => '',          'label' => '—'],
-                            ['value' => 'very easy', 'label' => 'sehr leicht'],
-                            ['value' => 'easy',      'label' => 'leicht'],
-                            ['value' => 'medium',    'label' => 'mittel'],
-                            ['value' => 'hard',      'label' => 'schwer'],
-                            ['value' => 'very hard', 'label' => 'sehr schwer'],
+                            ['value' => '',   'label' => '—'],
+                            ['value' => 'R1', 'label' => 'sehr leicht'],
+                            ['value' => 'R2', 'label' => 'leicht'],
+                            ['value' => 'R3', 'label' => 'mittel'],
+                            ['value' => 'R4', 'label' => 'schwer'],
+                            ['value' => 'R5', 'label' => 'sehr schwer'],
                         ]
                     ],
                 ],

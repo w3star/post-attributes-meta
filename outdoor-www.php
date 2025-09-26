@@ -68,8 +68,7 @@ class Outdoor_www
 
         add_action('add_meta_boxes',              [$this, 'add_classic_metabox']); // Fallback nur Classic
         add_action('save_post',                   [$this, 'save_classic_metabox']); // Fallback nur Classic
-        add_action('init',                        [$this, 'register_block_scripts'], 9);
-        add_action('init',                        [$this, 'register_blocks'], 10);
+        //add_action('init',                        [$this, 'register_blocks'], 10);
         add_action('wp_enqueue_scripts',          [$this, 'register_view_assets']);
 
         // OOP: Meta-Registrierung kapseln
@@ -156,40 +155,6 @@ class Outdoor_www
     }
 
 
-    /** ---------------------------- BLOCK-Editor-Skripte --------------------------- */
-    public function register_block_scripts()
-    {
-        wp_register_script(
-            'pam-stars-editor',
-            plugins_url('blocks/pam-stars/index.js', __FILE__),
-            ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-data', 'wp-i18n'],
-            OUTDOOR_WWW_VERSION,
-            true
-        );
-        wp_register_script(
-            'pam-explorer-editor',
-            plugins_url('blocks/pam-explorer/index.js', __FILE__),
-            ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'],
-            OUTDOOR_WWW_VERSION,
-            true
-        );
-    }
-
-    public function register_blocks()
-    {
-        register_block_type(__DIR__ . '/blocks/pam-stars', [
-            'editor_script'   => 'pam-stars-editor',
-            'style'           => 'pam-stars-style',
-            'render_callback' => [$this, 'render_block_stars'],
-        ]);
-
-        register_block_type(__DIR__ . '/blocks/pam-explorer', [
-            'editor_script'   => 'pam-explorer-editor',
-            'style'           => 'pam-explorer-style',
-            // WICHTIG: Kein 'script' mehr – das Frontend-View kommt über block.json::viewScript
-            'render_callback' => [$this, 'render_block_explorer'],
-        ]);
-    }
 
     public function register_view_assets()
     {
@@ -204,18 +169,22 @@ class Outdoor_www
     {
         return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/></svg>';
     }
+
     private function svg_star_empty()
     {
         return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/></svg>';
     }
+    
     private function svg_mountain()
     {
         return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 19h18L14 7l-2 3-2-3L3 19z"/></svg>';
     }
+    
     private function svg_sun()
     {
         return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.5" y1="4.5" x2="6.7" y2="6.7"/><line x1="17.3" y1="17.3" x2="19.5" y2="19.5"/><line x1="17.3" y1="6.7" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.7" y2="17.3"/></g></svg>';
     }
+    
     private function svg_stopwatch()
     {
         return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="2" width="4" height="2" fill="currentColor"/><line x1="12" y1="14" x2="15" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
@@ -227,6 +196,7 @@ class Outdoor_www
         for ($i = 0; $i < $count; $i++) $out .= $icon_html;
         return $out . '</span>';
     }
+    
     private function stars_html($star_rating)
     {
         $star_rating = max(0, min(5, (int)$star_rating));
@@ -234,6 +204,7 @@ class Outdoor_www
         for ($i = 1; $i <= 5; $i++) $out .= ($i <= $star_rating) ? $this->svg_star_filled() : $this->svg_star_empty();
         return $out . '</span>';
     }
+    
     private function duration_text($minutes)
     {
         $minutes = (int)$minutes;
@@ -245,47 +216,7 @@ class Outdoor_www
         return $m . ' min';
     }
 
-    /** ------------------------------ Block Renders ------------------------------- */
-    /*public function render_block_summary($attributes, $content, $block)
-    {
-        wp_enqueue_style('pam-summary-style');
-        $post_id = $block->context['postId'] ?? get_the_ID();
-        if (!$post_id) return '';
 
-        $star_rating       = (int) get_post_meta($post_id, 'star_rating', true);
-        $star_exclusivity  = (int) get_post_meta($post_id, 'star_exclusivity', true);
-        $star_time_relaxed = (int) get_post_meta($post_id, 'star_time_relaxed', true);
-        $star_difficulty   = (string) get_post_meta($post_id, 'star_difficulty', true);
-
-        $diff_count = $star_difficulty === 'hard' ? 3 : ($star_difficulty === 'medium' ? 2 : ($star_difficulty === 'easy' ? 1 : 0));
-        $mountains_html = $diff_count ? $this->icons_group($this->svg_mountain(), $diff_count) : '—';
-        $suns_html      = $star_exclusivity ? $this->icons_group($this->svg_sun(), $star_exclusivity) : '—';
-        $duration_html  = '<span class="pam-icongroup">' . $this->svg_stopwatch() . '</span> ' . $this->duration_text($star_time_relaxed);
-
-        ob_start(); ?>
-        <div class="pam-box pam-summary" role="group" aria-label="<?php esc_attr_e('Zusätzliche Informationen', 'outdoor-www'); ?>">
-            <div class="pam-summary__title"><?php _e('Zusätzliche Informationen', 'outdoor-www'); ?></div>
-            <ul class="pam-summary__list">
-                <li><span class="pam-label">Rating:</span> <?php echo $this->stars_html($star_rating); ?></li>
-                <li><span class="pam-label">Schwierigkeit:</span> <?php echo $mountains_html; ?></li>
-                <li><span class="pam-label">Exklusivität:</span> <?php echo $suns_html; ?></li>
-                <li><span class="pam-label">Dauer:</span> <?php echo $duration_html; ?></li>
-            </ul>
-        </div>
-    <?php
-        return ob_get_clean();
-    }*/
-
-
-
-    public function render_block_stars($attributes, $content, $block)
-    {
-        wp_enqueue_style('pam-stars-style');
-        $post_id = $block->context['postId'] ?? get_the_ID();
-        if (!$post_id) return '';
-        $star_rating = (int) get_post_meta($post_id, 'star_rating', true);
-        return '<div class="pam-stars">' . $this->stars_html($star_rating) . '</div>';
-    }
 
     /** ------------------------------- Explorer (SSR) ------------------------------ */
     private function build_url($args = [])
@@ -296,7 +227,7 @@ class Outdoor_www
         return esc_url($new);
     }
 
-    public function render_block_explorer($attributes, $content, $block)
+/*     public function render_block_explorer($attributes, $content, $block)
     {
         wp_enqueue_style('pam-explorer-style');
         // ❌ Kein wp_enqueue_script('pam-explorer-view') – viewScript kommt aus block.json
@@ -549,7 +480,7 @@ class Outdoor_www
 <?php
         return ob_get_clean();
     }
-}
+ */}
 
 new Outdoor_www();
 
