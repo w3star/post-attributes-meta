@@ -28,17 +28,47 @@
         const val = meta[key];
 
         switch (field.type) {
-            case 'int':
-                return h(PanelRow, {},
-                    h(RangeControl, {
+            case 'int': {
+                const min = field.min ?? 0, max = field.max ?? 99999, step = field.step ?? 1;
+                const coerce = (v) => {
+                    const n = parseInt(v, 10);
+                    if (isNaN(n)) return min;
+                    return Math.max(min, Math.min(max, n));
+                };
+
+                // Wenn widget === 'input' → Zahleneingabe; sonst Slider
+                if (field.widget === 'input') {
+                    // Nutze NumberControl wenn verfügbar, sonst TextControl-Fallback
+                    const NumberControl = wp.components.__experimentalNumberControl;
+                    const Control = NumberControl || wp.components.TextControl;
+
+                    // Inline-Layout: Label + Eingabe nebeneinander
+                    return wp.element.createElement(
+                        wp.components.PanelRow,
+                        null,
+                        wp.element.createElement('span', { className: 'pam-fieldlabel' }, field.label || field.key),
+                        wp.element.createElement(Control, {
+                            label: undefined,
+                            value: (val ?? ''),
+                            onChange: (next) => editMeta({ [key]: coerce(next) }),
+                            ...(NumberControl ? { min, max, step } : { inputMode: 'numeric', pattern: '[0-9]*' }),
+                            className: 'pam-number-inline'
+                        })
+                    );
+                }
+
+                // Standard: Slider
+                return wp.element.createElement(
+                    wp.components.PanelRow,
+                    null,
+                    wp.element.createElement(wp.components.RangeControl, {
                         label: field.label || key,
-                        value: toInt(val),
-                        min: field.min ?? 0,
-                        max: field.max ?? 100,
-                        step: field.step ?? 1,
-                        onChange: (next) => editMeta({ [key]: toInt(next) }),
+                        value: coerce(val),
+                        min, max, step,
+                        onChange: (next) => editMeta({ [key]: coerce(next) })
                     })
                 );
+            }
 
             case 'select':
                 return h(PanelRow, {},

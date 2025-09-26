@@ -31,6 +31,17 @@ define('OUTDOOR_WWW_VERSION', '1.1.0');
 define('OUTDOOR_WWW_PATH', plugin_dir_path(__FILE__));
 define('OUTDOOR_WWW_URL',  plugin_dir_url(__FILE__));
 
+
+// --- einfacher PSR-4 Autoloader für unser Namespace "OutdoorWww\" ---
+spl_autoload_register(function($class){
+    if (strpos($class, 'OutdoorWww\\') !== 0) return;
+    $rel = str_replace(['OutdoorWww\\', '\\'], ['', '/'], $class);
+    $file = __DIR__ . '/src/' . $rel . '.php';
+    if (is_file($file)) require $file;
+});
+
+
+
 class Outdoor_www
 {
     /**
@@ -69,8 +80,8 @@ class Outdoor_www
                 'id'    => 'owww_general',
                 'title' => 'Allgemein',
                 'fields' => [
-                    ['key' => 'star_rating',       'type' => 'int',    'label' => 'Rating',        'min' => 0, 'max' => 5, 'step' => 1],
-                    ['key' => 'star_exclusivity',  'type' => 'int',    'label' => 'Exklusivität',  'min' => 0, 'max' => 5, 'step' => 1],
+                    ['key' => 'star_rating',       'type' => 'int',    'label' => 'Rating',        'min' => 0, 'max' => 5, 'step' => 1, 'widget'=>'input'],
+                    ['key' => 'star_exclusivity',  'type' => 'int',    'label' => 'Exklusivität',  'min' => 0, 'max' => 5, 'step' => 1, 'widget'=>'input'],
                     ['key' => 'star_difficulty',   'type' => 'select', 'label' => 'Schwierigkeit', 'options' => [
                         ['value' => '',      'label' => '—'],
                         ['value' => 'easy',  'label' => 'Leicht'],
@@ -83,24 +94,13 @@ class Outdoor_www
                 'id'    => 'owww_time',
                 'title' => 'Outdoor www | Zeiten',
                 'fields' => [
-                    ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1],
-                    ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1],
-                    ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1],
-                    ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1],
-                    ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1],
+                    ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
+                    ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
+                    ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
+                    ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
+                    ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
                 ],
             ],
-            // Beispiel für später:
-            // [
-            //   'id'=>'owww_times',
-            //   'title'=>'Zeitvarianten',
-            //   'fields'=>[
-            //     ['key'=>'star_time_steady','type'=>'int','label'=>'Steady','min'=>0,'max'=>720,'step'=>10],
-            //     ['key'=>'star_time_moderate','type'=>'int','label'=>'Moderate','min'=>0,'max'=>720,'step'=>10],
-            //     ['key'=>'star_time_fast','type'=>'int','label'=>'Fast','min'=>0,'max'=>720,'step'=>10],
-            //     ['key'=>'star_time_veryfast','type'=>'int','label'=>'Very Fast','min'=>0,'max'=>720,'step'=>10],
-            //   ],
-            // ],
         ];
     }
 
@@ -143,12 +143,12 @@ class Outdoor_www
         wp_enqueue_script('owww-sidebar');
 
         // (Optional) Editor-Styles
-        // wp_enqueue_style(
-        //     'owww-editor-css',
-        //     plugins_url('blocks/editor.css', __FILE__),
-        //     ['wp-edit-blocks'],
-        //     OUTDOOR_WWW_VERSION
-        // );
+        wp_enqueue_style(
+            'owww-editor-css',
+            plugins_url('blocks/editor.css', __FILE__),
+            ['wp-edit-blocks'],
+            OUTDOOR_WWW_VERSION
+        );
     }
 
 
@@ -623,3 +623,8 @@ class Outdoor_www
 }
 
 new Outdoor_www();
+
+// --- Lifecycle: Aktivieren/Deaktivieren/Deinstallieren ---
+register_activation_hook(__FILE__,   ['Outdoor-Www\\Core\\Lifecycle', 'activate']);
+register_deactivation_hook(__FILE__, ['Outdoor-Www\\Core\\Lifecycle', 'deactivate']);
+register_uninstall_hook(__FILE__,    ['Outdoor-Www\\Core\\Lifecycle', 'uninstall']);

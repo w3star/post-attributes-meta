@@ -1,0 +1,14 @@
+/* Inline-Layout für PanelRow */
+.pam-section .components-panel__row {
+    align-items: center;
+}
+
+.pam-fieldlabel {
+    min-width: 140px;
+}
+
+.pam-number-inline .components-input-control__input,
+.pam-number-inline .components-text-control__input {
+    max-width: 120px;
+    /* kompakt */
+}
