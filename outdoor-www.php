@@ -34,7 +34,7 @@ define('OUTDOOR_WWW_URL',  plugin_dir_url(__FILE__));
 
 
 // --- einfacher PSR-4 Autoloader für unser Namespace "OutdoorWww\" ---
-spl_autoload_register(function($class){
+spl_autoload_register(function ($class) {
     if (strpos($class, 'OutdoorWww\\') !== 0) return;
     $rel = str_replace(['OutdoorWww\\', '\\'], ['', '/'], $class);
     $file = __DIR__ . '/src/' . $rel . '.php';
@@ -61,96 +61,105 @@ class Outdoor_www
         'star_time_veryfast' => ['type' => 'integer', 'single' => true, 'default' => 0],
     ];
 
+
+    /** -------------------------- Konstruktor & Hooks -------------------------- */
     public function __construct()
     {
-        add_action('init',                        [$this, 'register_meta']);
-        add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
+
         add_action('add_meta_boxes',              [$this, 'add_classic_metabox']); // Fallback nur Classic
         add_action('save_post',                   [$this, 'save_classic_metabox']); // Fallback nur Classic
         add_action('init',                        [$this, 'register_block_scripts'], 9);
         add_action('init',                        [$this, 'register_blocks'], 10);
         add_action('wp_enqueue_scripts',          [$this, 'register_view_assets']);
+
+        // OOP: Meta-Registrierung kapseln
+        new \OutdoorWww\Meta\Registrar(self::META, ['post', 'page']);
+
+        // OOP: Gutenberg-Sidebar + Sections
+        new \OutdoorWww\Admin\Sidebar(\OutdoorWww\Admin\Sidebar::defaultSections());
     }
 
-    /** ---------- Gutenberg-Bereiche konfigurieren (frei benennbar) ---------- */
-    private function meta_sections_config(): array
-    {
-        // 👉 Hier bestimmst du Titel & Felder deiner Bereiche. Du kannst das jederzeit erweitern.
-        return [
-            [
-                'id'    => 'owww_general',
-                'title' => 'Allgemein',
-                'fields' => [
-                    ['key' => 'star_rating',       'type' => 'int',    'label' => 'Rating',        'min' => 0, 'max' => 5, 'step' => 1, 'widget'=>'input'],
-                    ['key' => 'star_exclusivity',  'type' => 'int',    'label' => 'Exklusivität',  'min' => 0, 'max' => 5, 'step' => 1, 'widget'=>'input'],
-                    ['key' => 'star_difficulty',   'type' => 'select', 'label' => 'Schwierigkeit', 'options' => [
-                        ['value' => '',      'label' => '—'],
-                        ['value' => 'easy',  'label' => 'Leicht'],
-                        ['value' => 'medium', 'label' => 'Mittel'],
-                        ['value' => 'hard',  'label' => 'Schwer'],
-                    ]],
-                ],
-            ],
-            [
-                'id'    => 'owww_time',
-                'title' => 'Outdoor www | Zeiten',
-                'fields' => [
-                    ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
-                    ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
-                    ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
-                    ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
-                    ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1, 'widget'=>'input'],
-                ],
-            ],
-        ];
-    }
 
-    /** ----------------------------- META REGISTRIEREN ----------------------------- */
-    public function register_meta()
-    {
-        foreach (['post', 'page'] as $ptype) {
-            foreach (self::META as $meta_key => $args) {
-                register_post_meta($ptype, $meta_key, [
-                    'type'              => $args['type'],
-                    'single'            => $args['single'],
-                    'default'           => $args['default'],
-                    'show_in_rest'      => true, // ✅ nötig für Gutenberg-Panels
-                    'sanitize_callback' => null,
-                    'auth_callback'     => function ($allowed, $key, $post_id) {
-                        return current_user_can('edit_post', (int)$post_id);
-                    },
-                ]);
-            }
-        }
-    }
 
-    /** ------------------------- EDITOR-ASSETS (Gutenberg UI) ---------------------- */
-    public function enqueue_editor_assets()
-    {
-        // 1) Script registrieren (noch nicht enqueuen)
-        wp_register_script(
-            'owww-sidebar',
-            plugins_url('blocks/pam-sidebar.js', __FILE__),
-            // ❗ KORREKT: 'wp-plugins' (Plural!) + 'wp-editor' wird für den core/editor-Store benötigt
-            ['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-editor', 'wp-i18n'],
-            OUTDOOR_WWW_VERSION,
-            true
-        );
+    // /** ---------- Gutenberg-Bereiche konfigurieren (frei benennbar) ---------- */
+    // private function meta_sections_config(): array
+    // {
+    //     // 👉 Hier bestimmst du Titel & Felder deiner Bereiche. Du kannst das jederzeit erweitern.
+    //     return [
+    //         [
+    //             'id'    => 'owww_general',
+    //             'title' => 'Allgemein',
+    //             'fields' => [
+    //                 ['key' => 'star_rating',       'type' => 'int',    'label' => 'Rating',        'min' => 0, 'max' => 5, 'step' => 1, 'widget' => 'input'],
+    //                 ['key' => 'star_exclusivity',  'type' => 'int',    'label' => 'Exklusivität',  'min' => 0, 'max' => 5, 'step' => 1, 'widget' => 'input'],
+    //                 ['key' => 'star_difficulty',   'type' => 'select', 'label' => 'Schwierigkeit', 'options' => [
+    //                     ['value' => '',      'label' => '—'],
+    //                     ['value' => 'easy',  'label' => 'Leicht'],
+    //                     ['value' => 'medium', 'label' => 'Mittel'],
+    //                     ['value' => 'hard',  'label' => 'Schwer'],
+    //                 ]],
+    //             ],
+    //         ],
+    //         [
+    //             'id'    => 'owww_time',
+    //             'title' => 'Outdoor www | Zeiten',
+    //             'fields' => [
+    //                 ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
+    //                 ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
+    //                 ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
+    //                 ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
+    //                 ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
+    //             ],
+    //         ],
+    //     ];
+    // }
 
-        // 2) Konfiguration vor dem Enqueue injizieren
-        wp_localize_script('owww-sidebar', 'PAM_SECTIONS', $this->meta_sections_config());
+    // /** ----------------------------- META REGISTRIEREN ----------------------------- */
+    // public function register_meta()
+    // {
+    //     foreach (['post', 'page'] as $ptype) {
+    //         foreach (self::META as $meta_key => $args) {
+    //             register_post_meta($ptype, $meta_key, [
+    //                 'type'              => $args['type'],
+    //                 'single'            => $args['single'],
+    //                 'default'           => $args['default'],
+    //                 'show_in_rest'      => true, // ✅ nötig für Gutenberg-Panels
+    //                 'sanitize_callback' => null,
+    //                 'auth_callback'     => function ($allowed, $key, $post_id) {
+    //                     return current_user_can('edit_post', (int)$post_id);
+    //                 },
+    //             ]);
+    //         }
+    //     }
+    // }
 
-        // 3) Jetzt erst enqueuen
-        wp_enqueue_script('owww-sidebar');
+    // /** ------------------------- EDITOR-ASSETS (Gutenberg UI) ---------------------- */
+    // public function enqueue_editor_assets()
+    // {
+    //     // 1) Script registrieren (noch nicht enqueuen)
+    //     wp_register_script(
+    //         'owww-sidebar',
+    //         plugins_url('blocks/pam-sidebar.js', __FILE__),
+    //         // ❗ KORREKT: 'wp-plugins' (Plural!) + 'wp-editor' wird für den core/editor-Store benötigt
+    //         ['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-editor', 'wp-i18n'],
+    //         OUTDOOR_WWW_VERSION,
+    //         true
+    //     );
 
-        // (Optional) Editor-Styles
-        wp_enqueue_style(
-            'owww-editor-css',
-            plugins_url('blocks/editor.css', __FILE__),
-            ['wp-edit-blocks'],
-            OUTDOOR_WWW_VERSION
-        );
-    }
+    //     // 2) Konfiguration vor dem Enqueue injizieren
+    //     wp_localize_script('owww-sidebar', 'PAM_SECTIONS', $this->meta_sections_config());
+
+    //     // 3) Jetzt erst enqueuen
+    //     wp_enqueue_script('owww-sidebar');
+
+    //     // (Optional) Editor-Styles
+    //     wp_enqueue_style(
+    //         'owww-editor-css',
+    //         plugins_url('blocks/editor.css', __FILE__),
+    //         ['wp-edit-blocks'],
+    //         OUTDOOR_WWW_VERSION
+    //     );
+    // }
 
 
     /** ----------------------- CLASSIC EDITOR: Fallback-Metabox --------------------- */
@@ -205,19 +214,25 @@ class Outdoor_www
     <?php
     }
 
+
+    /**
+     * Speichern der Metadaten aus der klassischen Metabox
+     */
     public function save_classic_metabox($post_id)
     {
         if (!isset($_POST['star_meta_box_nonce']) || !wp_verify_nonce($_POST['star_meta_box_nonce'], 'star_meta_box_save')) return;
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
         if (!current_user_can('edit_post', $post_id)) return;
 
-        // ⚠️ Bugfix: KEIN doppeltes "star_"-Prefix!
-        foreach (array_keys(self::META) as $field) {
-            if (isset($_POST[$field])) {
-                update_post_meta($post_id, $field, sanitize_text_field($_POST[$field]));
+        foreach (array_keys(self::META) as $key) {
+            if (isset($_POST[$key])) {
+                $type = self::META[$key]['type'] ?? 'string';
+                $clean = \OutdoorWww\Meta\Registrar::sanitizeForKey($key, $type, $_POST[$key]);
+                update_post_meta($post_id, $key, $clean);
             }
         }
     }
+
 
     /** ---------------------------- BLOCK-Editor-Skripte --------------------------- */
     public function register_block_scripts()
@@ -626,14 +641,18 @@ class Outdoor_www
 new Outdoor_www();
 
 // --- Lifecycle-Hooks: Klasse beim Aufruf explizit laden ---
-register_activation_hook(__FILE__, function () {
-    require_once __DIR__ . '/src/Core/Lifecycle.php';
-    OutdoorWww\Core\Lifecycle::activate();
-});
+register_activation_hook(
+    __FILE__,
+    function () {
+        require_once __DIR__ . '/src/Core/Lifecycle.php';
+        OutdoorWww\Core\Lifecycle::activate();
+    }
+);
 
-register_deactivation_hook(__FILE__, function () {
-    require_once __DIR__ . '/src/Core/Lifecycle.php';
-    OutdoorWww\Core\Lifecycle::deactivate();
-});
-
-
+register_deactivation_hook(
+    __FILE__,
+    function () {
+        require_once __DIR__ . '/src/Core/Lifecycle.php';
+        OutdoorWww\Core\Lifecycle::deactivate();
+    }
+);
