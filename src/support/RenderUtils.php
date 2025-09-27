@@ -57,7 +57,7 @@ class RenderUtils
     }
 
 
-    
+
     public static function duration_text(int $minutes): string
     {
         $minutes = (int)$minutes;
@@ -68,4 +68,19 @@ class RenderUtils
         if ($h > 0) return $h . ' h';
         return $m . ' min';
     }
+
+
+
+    public static function difficultyCount(string $diff): int
+    {
+        return $diff === 'hard' ? 3 : ($diff === 'medium' ? 2 : ($diff === 'easy' ? 1 : 0));
+    }
+
+
+
+    public static function difficultyLabel(string $diff): string
+    {
+        return $diff === 'hard' ? 'Schwer' : ($diff === 'medium' ? 'Mittel' : ($diff === 'easy' ? 'Leicht' : '—'));
+    }
+    
 }

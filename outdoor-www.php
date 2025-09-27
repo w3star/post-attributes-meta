@@ -47,7 +47,6 @@ class Outdoor_www
 {
     /**
      * Alle verwendeten Meta-Keys (inkl. Typ/Default).
-     * Hinweis: Keys sind bereits mit "star_" benannt – NICHT nochmals prefixen.
      */
     const META = [
         'star_rating'        => ['type' => 'integer', 'single' => true, 'default' => 0],
@@ -68,8 +67,7 @@ class Outdoor_www
 
         add_action('add_meta_boxes',              [$this, 'add_classic_metabox']); // Fallback nur Classic
         add_action('save_post',                   [$this, 'save_classic_metabox']); // Fallback nur Classic
-        //add_action('init',                        [$this, 'register_blocks'], 10);
-        add_action('wp_enqueue_scripts',          [$this, 'register_view_assets']);
+        //add_action('wp_enqueue_scripts',          [$this, 'register_view_assets']);
 
         // OOP: Meta-Registrierung kapseln
         new \OutdoorWww\Meta\Registrar(self::META, ['post', 'page']);
@@ -79,6 +77,9 @@ class Outdoor_www
 
         // OOP: Blocks – Schritt 1: nur Summary in OOP
         new \OutdoorWww\Blocks\Registrar();
+
+        new \OutdoorWww\Assets\Registrar();
+
     }
 
 
@@ -153,81 +154,9 @@ class Outdoor_www
             }
         }
     }
-
-
-
-    public function register_view_assets()
-    {
-        wp_register_style('pam-summary-style',  plugins_url('blocks/pam-summary/style.css', __FILE__), [], OUTDOOR_WWW_VERSION);
-        wp_register_style('pam-stars-style',    plugins_url('blocks/pam-stars/style.css', __FILE__), [], OUTDOOR_WWW_VERSION);
-        wp_register_style('pam-explorer-style', plugins_url('blocks/pam-explorer/style.css', __FILE__), [], OUTDOOR_WWW_VERSION);
-        // ❌ Kein wp_register_script('pam-explorer-view' ...) mehr – doppelte Ladung vermeiden
-    }
-
-    /** ------------------------------- SVG ICONS ---------------------------------- */
-    private function svg_star_filled()
-    {
-        return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/></svg>';
-    }
-
-    private function svg_star_empty()
-    {
-        return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M12 17.27L18.18 21 16.54 13.97 22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/></svg>';
-    }
-    
-    private function svg_mountain()
-    {
-        return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 19h18L14 7l-2 3-2-3L3 19z"/></svg>';
-    }
-    
-    private function svg_sun()
-    {
-        return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><g stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.5" y1="4.5" x2="6.7" y2="6.7"/><line x1="17.3" y1="17.3" x2="19.5" y2="19.5"/><line x1="17.3" y1="6.7" x2="19.5" y2="4.5"/><line x1="4.5" y1="19.5" x2="6.7" y2="17.3"/></g></svg>';
-    }
-    
-    private function svg_stopwatch()
-    {
-        return '<svg class="pam-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="14" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="10" y="2" width="4" height="2" fill="currentColor"/><line x1="12" y1="14" x2="15" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
-    }
-
-    private function icons_group($icon_html, $count)
-    {
-        $out = '<span class="pam-icongroup">';
-        for ($i = 0; $i < $count; $i++) $out .= $icon_html;
-        return $out . '</span>';
-    }
-    
-    private function stars_html($star_rating)
-    {
-        $star_rating = max(0, min(5, (int)$star_rating));
-        $out = '<span class="pam-icongroup" aria-label="Rating ' . $star_rating . ' von 5">';
-        for ($i = 1; $i <= 5; $i++) $out .= ($i <= $star_rating) ? $this->svg_star_filled() : $this->svg_star_empty();
-        return $out . '</span>';
-    }
-    
-    private function duration_text($minutes)
-    {
-        $minutes = (int)$minutes;
-        if ($minutes <= 0) return '—';
-        $h = intdiv($minutes, 60);
-        $m = $minutes % 60;
-        if ($h > 0 && $m > 0) return $h . ' h ' . $m . ' min';
-        if ($h > 0) return $h . ' h';
-        return $m . ' min';
-    }
-
-
-
-    /** ------------------------------- Explorer (SSR) ------------------------------ */
-    private function build_url($args = [])
-    {
-        $url  = (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $base = remove_query_arg(array_keys($_GET), $url);
-        $new  = add_query_arg(array_merge($_GET, $args), $base);
-        return esc_url($new);
-    }
-
 }
+
+
 
 new Outdoor_www();
 

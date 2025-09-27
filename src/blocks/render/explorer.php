@@ -56,7 +56,7 @@ class Explorer
             $pager_html .= '<nav class="pam-pager" role="navigation" aria-label="Seitennummerierung"><ul>';
             for ($p=1; $p<=$total_pages; $p++) {
                 $cls = $p===$paged ? ' class="is-active"' : '';
-                $url = esc_url(self::build_url(['star_page'=>$p]));
+                $url = esc_url(Url::build_url(['star_page'=>$p]));
                 $pager_html .= "<li$cls><a href=\"$url\">$p</a></li>";
             }
             $pager_html .= '</ul></nav>';
