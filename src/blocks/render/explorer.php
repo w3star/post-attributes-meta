@@ -94,7 +94,7 @@ class Explorer
                 </label>
 
                 <label>Schwierigkeit (von/bis)
-                    <div class="minmax" data-field="star_difficulty" data-min="1" data-max="3" data-step="1">
+                    <div class="minmax" data-field="star_difficulty_hiking" data-min="1" data-max="3" data-step="1">
                         <input type="range" name="diff_from_i" min="1" max="3" step="1" value="<?php echo esc_attr($f['d_from_i']); ?>" aria-label="Schwierigkeit von (1=Leicht, 3=Schwer)" />
                         <input type="range" name="diff_to_i"   min="1" max="3" step="1" value="<?php echo esc_attr($f['d_to_i']); ?>"   aria-label="Schwierigkeit bis (1=Leicht, 3=Schwer)" />
                         <div class="track" aria-hidden="true"><div class="range"></div></div>
@@ -152,7 +152,7 @@ class Explorer
                             $rating = (int) get_post_meta($pid,'star_rating',true);
                             $beauty = (int) get_post_meta($pid,'star_exclusivity',true);
                             $dur    = (int) get_post_meta($pid,'star_time_relaxed',true);
-                            $diff   = (string) get_post_meta($pid,'star_difficulty',true);
+                            $diff   = (string) get_post_meta($pid,'star_difficulty_hiking',true);
                             $diff_lbl = $diff==='hard'?'Schwer':($diff==='medium'?'Mittel':($diff==='easy'?'Leicht':'—'));
                             $cats_arr = get_the_category($pid);
                             $cats_txt = $cats_arr ? implode(', ', wp_list_pluck($cats_arr,'name')) : '—';

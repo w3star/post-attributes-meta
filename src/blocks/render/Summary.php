@@ -16,9 +16,9 @@ class Summary
         $star_rating       = (int) get_post_meta($post_id, 'star_rating', true);
         $star_exclusivity  = (int) get_post_meta($post_id, 'star_exclusivity', true);
         $star_time_relaxed = (int) get_post_meta($post_id, 'star_time_relaxed', true);
-        $star_difficulty   = (string) get_post_meta($post_id, 'star_difficulty', true);
+        $star_difficulty_hiking   = (string) get_post_meta($post_id, 'star_difficulty_hiking', true);
 
-        $diff_count = $star_difficulty === 'hard' ? 3 : ($star_difficulty === 'medium' ? 2 : ($star_difficulty === 'easy' ? 1 : 0));
+        $diff_count = $star_difficulty_hiking === 'hard' ? 3 : ($star_difficulty_hiking === 'medium' ? 2 : ($star_difficulty_hiking === 'easy' ? 1 : 0));
         $mountains_html = $diff_count ? RenderUtils::icons_group(RenderUtils::svg_mountain(), $diff_count) : '—';
         $suns_html      = $star_exclusivity ? RenderUtils::icons_group(RenderUtils::svg_sun(), $star_exclusivity) : '—';
         $duration_html  = '<span class="pam-icongroup">' . RenderUtils::svg_stopwatch() . '</span> ' . RenderUtils::duration_text($star_time_relaxed);

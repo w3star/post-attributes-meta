@@ -54,7 +54,7 @@ class Query
             ['key'=>'star_time_relaxed', 'value'=>[$filters['dur_from'],$filters['dur_to']], 'compare'=>'BETWEEN', 'type'=>'NUMERIC'],
         ];
         if (count($filters['diff_vals']) < 3) {
-            $meta_query[] = ['key'=>'star_difficulty','value'=>$filters['diff_vals'],'compare'=>'IN'];
+            $meta_query[] = ['key'=>'star_difficulty_hiking','value'=>$filters['diff_vals'],'compare'=>'IN'];
         }
 
         $paged = max(1, (int)($_GET['star_page'] ?? 1));

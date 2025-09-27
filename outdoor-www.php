@@ -57,7 +57,7 @@ class Outdoor_www
         new \OutdoorWww\Meta\Registrar(MetaConfig::defaults(), ['post']);
 
         // 2) Gutenberg-Sidebar (weiterhin deine Sections)
-        new \OutdoorWww\Admin\Sidebar(\OutdoorWww\Admin\Sidebar::defaultSections());
+        new \OutdoorWww\Admin\Sidebar();
 
         // 3) Frontend/Editor assets
         new \OutdoorWww\Assets\Registrar();

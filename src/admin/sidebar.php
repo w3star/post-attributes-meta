@@ -2,6 +2,8 @@
 
 namespace OutdoorWww\Admin;
 
+use OutdoorWww\Config\Meta as MetaConfig;
+
 
 /**
  * Fügt dem Block-Editor eine Sidebar hinzu
@@ -19,11 +21,13 @@ class Sidebar
      *
      * @param array[] $sections Sektionen/Konfiguration
      */
-    public function __construct(array $sections)
+    public function __construct()
     {
-        $this->sections = $sections;
+        $this->sections = $sections ?? self::sectionsFromMeta(
+            MetaConfig::defaults(),
+            MetaConfig::groups()
+        );
 
-        // Nur im Block-Editor laden
         add_action('enqueue_block_editor_assets', [$this, 'enqueue']);
     }
 
@@ -55,62 +59,34 @@ class Sidebar
 
 
 
-    /**
-     * Hilfs-Factory: Default-Sektionen – kann extern überschrieben werden
-     */
-    public static function defaultSections(): array
+    /** Baut Gutenberg-Sections aus Meta-Defs + Gruppen */
+    public static function sectionsFromMeta(array $defs, array $groups): array
     {
-        return [
-            [
-                'id'    => 'owww_general',
-                'title' => 'Allgemein',
-                'fields' => [
-                    ['key' => 'star_distance',     'type' => 'int',    'label' => 'Distanz',      'min' => 0, 'max' => 1000, 'step' => 10, 'widget' => 'input'],
-                    ['key' => 'star_ascent',       'type' => 'int',    'label' => 'Aufstieg',     'min' => 0, 'max' => 10000, 'step' => 10, 'widget' => 'input'],
-                    ['key' => 'star_descent',      'type' => 'int',    'label' => 'Abstieg',      'min' => 0, 'max' => 10000, 'step' => 10, 'widget' => 'input'],
-                    ['key' => 'star_rating',       'type' => 'int',    'label' => 'Rating',       'min' => 0, 'max' => 5, 'step' => 1, 'widget' => 'input'],
-                    ['key' => 'star_exclusivity',  'type' => 'int',    'label' => 'Exklusivität', 'min' => 0, 'max' => 5, 'step' => 1, 'widget' => 'input'],
-                    [
-                        'key' => 'star_difficulty',
-                        'type' => 'select',
-                        'label' => 'tech. Schwierigkeit',
-                        'options' => [
-                            ['value' => '',   'label' => '—'],
-                            ['value' => 'T1', 'label' => 'T1'],
-                            ['value' => 'T2', 'label' => 'T2'],
-                            ['value' => 'T3', 'label' => 'T3'],
-                            ['value' => 'T4', 'label' => 'T4'],
-                            ['value' => 'T5', 'label' => 'T5'],
-                            ['value' => 'T6', 'label' => 'T6'],
-                        ]
-                    ],
-                    [
-                        'key' => 'star_requirements',
-                        'type' => 'select',
-                        'label' => 'phys. Anforderungen',
-                        'options' => [
-                            ['value' => '',   'label' => '—'],
-                            ['value' => 'R1', 'label' => 'sehr leicht'],
-                            ['value' => 'R2', 'label' => 'leicht'],
-                            ['value' => 'R3', 'label' => 'mittel'],
-                            ['value' => 'R4', 'label' => 'schwer'],
-                            ['value' => 'R5', 'label' => 'sehr schwer'],
-                        ]
-                    ],
-                ],
-            ],
-            [
-                'id'    => 'owww_time',
-                'title' => 'Outdoor www | Zeiten',
-                'fields' => [
-                    ['key' => 'star_days',          'type' => 'int', 'label' => 'Anzahl Tage',          'min' => 0, 'max' => 7,    'step' => 1, 'widget' => 'input'],
-                    ['key' => 'star_time_relaxed',  'type' => 'int', 'label' => 'Dauer (entspannt)',    'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-                    ['key' => 'star_time_steady',   'type' => 'int', 'label' => 'Dauer (gemächlich)',   'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-                    ['key' => 'star_time_moderate', 'type' => 'int', 'label' => 'Dauer (mässig)',       'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-                    ['key' => 'star_time_fast',     'type' => 'int', 'label' => 'Dauer (schnell)',      'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-                    ['key' => 'star_time_veryfast', 'type' => 'int', 'label' => 'Dauer (sehr schnell)', 'min' => 0, 'max' => 4000, 'step' => 1, 'widget' => 'input'],
-                ],
-            ],
-        ];
+        $byGroup = [];
+        foreach ($defs as $key => $def) {
+            $g = $def['group'] ?? 'general';
+            $ui = $def['ui']    ?? ['label' => $key, 'widget' => 'input'];
+            $field = [
+                'key'    => $key,
+                'type'   => ($def['type'] ?? 'string') === 'integer' ? 'int' : 'text',
+                'label'  => $ui['label'] ?? $key,
+                'widget' => $ui['widget'] ?? 'input',
+            ];
+            // range/input Details:
+            foreach (['min', 'max', 'step', 'options'] as $k) {
+                if (isset($ui[$k])) $field[$k] = $ui[$k];
+            }
+            $byGroup[$g]['fields'][] = $field;
+        }
+        // Titel einsetzen
+        $sections = [];
+        foreach ($byGroup as $gid => $data) {
+            $sections[] = [
+                'id'     => 'owww_' . $gid,
+                'title'  => $groups[$gid] ?? ucfirst($gid),
+                'fields' => array_values($data['fields'] ?? []),
+            ];
+        }
+        return $sections;
     }
 }

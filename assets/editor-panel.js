@@ -20,7 +20,7 @@
     }, [meta]);
 
     function handleDifficulty(value){
-      setMeta('star_difficulty', value);
+      setMeta('star_difficulty_hiking', value);
     }
 
     return el( PluginDocumentSettingPanel, { name:'pam-panel', title:'Zusatzinfos', className:'pam-panel' },
@@ -31,7 +31,7 @@
       } ),
       el( SelectControl, {
         label: 'Schwierigkeit',
-        value: meta.star_difficulty || '',
+        value: meta.star_difficulty_hiking || '',
         options: [
           { label: '—', value: '' },
           { label: 'Leicht', value: 'easy' },

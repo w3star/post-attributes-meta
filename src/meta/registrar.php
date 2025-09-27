@@ -82,7 +82,7 @@ class Registrar
                 $v = (int)$value;
                 return $v < 0 ? 0 : min($v, 10080);
 
-            case 'star_difficulty':
+            case 'star_difficulty_hiking':
                 $v = (string)$value;
                 $allowed = ['', 'easy', 'medium', 'hard'];
                 return in_array($v, $allowed, true) ? $v : '';

@@ -1,4 +1,5 @@
 <?php
+
 namespace OutdoorWww\Admin;
 
 use OutdoorWww\Config\Meta as MetaConfig;
@@ -27,7 +28,7 @@ class ClassicMetaBox
         if (function_exists('use_block_editor_for_post_type') && use_block_editor_for_post_type('post')) {
             return; // Gutenberg aktiv -> keine Fallback-Box
         }
-        foreach (['post','page'] as $ptype) {
+        foreach (['post', 'page'] as $ptype) {
             add_meta_box(
                 'owww_meta_fallback',
                 __('Zusatzinfos (Fallback)', 'outdoor-www'),
@@ -43,31 +44,40 @@ class ClassicMetaBox
 
     public function renderBox(\WP_Post $post): void
     {
-        wp_nonce_field('owww_fallback_save','owww_fallback_nonce');
+        wp_nonce_field('owww_fallback_save', 'owww_fallback_nonce');
 
         foreach ($this->defs as $key => $def) {
-            $type    = $def['type']   ?? 'string';
-            $label   = $this->labelFromKey($key);
-            $value   = get_post_meta($post->ID, $key, true);
+            // ...
+            $ui    = $def['ui'] ?? ['label' => $this->labelFromKey($key), 'widget' => 'input'];
+            $label = $ui['label'] ?? $this->labelFromKey($key);
+            $widget = $ui['widget'] ?? 'input';
+            $value = get_post_meta($post->ID, $key, true);
 
-            echo '<p><label>'.esc_html($label).'<br>';
+            echo '<p><label>' . esc_html($label) . '<br>';
 
-            if ($key === 'star_difficulty') {
-                // Spezifische Auswahl für Difficulty
+            if ($widget === 'select' && !empty($ui['options'])) {
                 $cur = (string)$value;
-                echo '<select name="'.esc_attr($key).'">';
-                echo '<option value="" '.selected($cur,'', false).'>—</option>';
-                echo '<option value="easy" '.selected($cur,'easy', false).'>'.esc_html__('Leicht','outdoor-www').'</option>';
-                echo '<option value="medium" '.selected($cur,'medium', false).'>'.esc_html__('Mittel','outdoor-www').'</option>';
-                echo '<option value="hard" '.selected($cur,'hard', false).'>'.esc_html__('Schwer','outdoor-www').'</option>';
+                echo '<select name="' . esc_attr($key) . '">';
+                foreach ($ui['options'] as $opt) {
+                    $val = (string)$opt['value'];
+                    $lab = (string)$opt['label'];
+                    echo '<option value="' . esc_attr($val) . '" ' . selected($cur, $val, false) . '>' . esc_html($lab) . '</option>';
+                }
                 echo '</select>';
-            } elseif ($type === 'integer') {
-                echo '<input type="number" name="'.esc_attr($key).'" value="'.esc_attr((int)$value).'" step="1">';
+            } elseif (($def['type'] ?? 'string') === 'integer') {
+                $min = isset($ui['min']) ? (int)$ui['min'] : null;
+                $max = isset($ui['max']) ? (int)$ui['max'] : null;
+                $step = isset($ui['step']) ? (int)$ui['step'] : 1;
+                echo '<input type="number" name="' . esc_attr($key) . '" value="' . esc_attr((int)$value) . '" step="' . esc_attr($step) . '"' .
+                    (!is_null($min) ? ' min="' . esc_attr($min) . '"' : '') .
+                    (!is_null($max) ? ' max="' . esc_attr($max) . '"' : '') . ' >';
             } else {
-                echo '<input type="text" name="'.esc_attr($key).'" value="'.esc_attr((string)$value).'">';
+                echo '<input type="text" name="' . esc_attr($key) . '" value="' . esc_attr((string)$value) . '">';
             }
 
             echo '</label></p>';
+            // ...
+
         }
     }
 
@@ -75,7 +85,7 @@ class ClassicMetaBox
 
     public function save(int $post_id): void
     {
-        if (!isset($_POST['owww_fallback_nonce']) || !wp_verify_nonce($_POST['owww_fallback_nonce'],'owww_fallback_save')) return;
+        if (!isset($_POST['owww_fallback_nonce']) || !wp_verify_nonce($_POST['owww_fallback_nonce'], 'owww_fallback_save')) return;
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
         if (!current_user_can('edit_post', $post_id)) return;
 
@@ -93,10 +103,10 @@ class ClassicMetaBox
     {
         // kleine Heuristik → sprechende Labels ohne Übersetzungsaufwand
         $map = [
-            'star_rating'       => __('Rating','outdoor-www'),
-            'star_exclusivity'  => __('Exklusivität','outdoor-www'),
-            'star_difficulty'   => __('Schwierigkeit','outdoor-www'),
-            'star_time_relaxed' => __('Dauer (Minuten)','outdoor-www'),
+            'star_rating'       => __('Rating', 'outdoor-www'),
+            'star_exclusivity'  => __('Exklusivität', 'outdoor-www'),
+            'star_difficulty_hiking'   => __('Schwierigkeit', 'outdoor-www'),
+            'star_time_relaxed' => __('Dauer (Minuten)', 'outdoor-www'),
         ];
         if (isset($map[$key])) return $map[$key];
 
