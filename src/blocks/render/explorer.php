@@ -7,6 +7,9 @@ use OutdoorWww\Support\Icons;
 use OutdoorWww\Explorer\Query as ExplorerQuery;
 use OutdoorWww\Support\RenderUtils;
 
+use OutdoorWww\Config\Fields;
+use OutdoorWww\Config\MetaHelper;
+
 class Explorer
 {
     private static function build_url(array $args = []): string
@@ -26,6 +29,37 @@ class Explorer
     {
         wp_enqueue_style('owww-explorer-style');
         // view.js kommt über block.json::viewScript → keine doppelte Enqueue hier!
+
+        // 1) Options-Werte laden (in Options-Reihenfolge)
+        $diffValues = MetaHelper::optionValues(Fields::difficulty()); // z.B. ['', 'T1','T2','T3','T4','T5'] oder ['','easy','...']
+        if ($diffValues) {
+            // 2) Leeren Placeholder am Anfang entfernen
+            $hasEmptyFirst = ($diffValues[0] === '');
+            if ($hasEmptyFirst) array_shift($diffValues);
+            $maxIdx = count($diffValues); // 1..N
+
+            // 3) Eingaben normalisieren
+            $from = isset($_GET['diff_from_i']) ? max(1, min($maxIdx, (int)$_GET['diff_from_i'])) : 1;
+            $to   = isset($_GET['diff_to_i'])   ? max(1, min($maxIdx, (int)$_GET['diff_to_i']))   : $maxIdx;
+            if ($from > $to) {
+                $t = $from;
+                $from = $to;
+                $to = $t;
+            }
+
+            // 4) Values im Bereich [from..to] sammeln
+            $diffAllowed = array_slice($diffValues, $from - 1, $to - $from + 1);
+
+            // 5) meta_query ergänzen (string-Vergleich)
+            if (count($diffAllowed) < $maxIdx) {
+                $meta_query[] = [
+                    'key'     => Fields::difficulty(),
+                    'value'   => $diffAllowed,
+                    'compare' => 'IN',
+                ];
+            }
+        }
+
 
         $f = ExplorerQuery::readFilters();
         [$args, $meta_key, $paged] = ExplorerQuery::buildArgs($f);
@@ -158,20 +192,19 @@ class Explorer
                                 $pid  = get_the_ID();
                                 $title = get_the_title();
                                 $perma = get_permalink();
-                                $rating = (int) get_post_meta($pid, 'owww_rating', true);
-                                $exclusivity = (int) get_post_meta($pid, 'owww_exclusivity', true);
-                                $dur    = (int) get_post_meta($pid, 'owww_time_relaxed', true);
-                                $diff   = (string) get_post_meta($pid, 'owww_difficulty_hiking', true);
-                                $diff_lbl = $diff === 'T6' ? 'T6' : ($diff === 'T5' ? 'T5' : ($diff === 'T4' ? 'T4' : ($diff === 'T3' ? 'T3' : ($diff === 'T2' ? 'T2' : ($diff === 'T1' ? 'T1' : '—')))));
+                                $rating = (int)    get_post_meta($pid, Fields::rating(),     true);
+                                $excl   = (int)    get_post_meta($pid, Fields::exclusivity(), true);
+                                $dur    = (int)    get_post_meta($pid, Fields::duration(),    true);
+                                $diffV  = (string) get_post_meta($pid, Fields::difficulty(),  true);
                                 $cats_arr = get_the_category($pid);
                                 $cats_txt = $cats_arr ? implode(', ', wp_list_pluck($cats_arr, 'name')) : '—';
                             ?>
                                 <tr>
                                     <td><a href="<?php echo esc_url($perma); ?>"><?php echo esc_html($title); ?></a></td>
                                     <td><?php echo Html::stars($rating); ?></td>
-                                    <td><?php echo $exclusivity ? Html::iconGroup(Icons::sun(), $exclusivity) : '—'; ?></td>
+                                    <td><?php echo $excl ? Html::iconGroup(Icons::sun(), $excl) : '—'; ?></td>
+                                    <td><?php echo esc_html(Html::difficultyLabel($diffV)); ?></td>
                                     <td><?php echo esc_html(Html::durationText($dur)); ?></td>
-                                    <td><?php echo esc_html($diff_lbl); ?></td>
                                     <td><?php echo esc_html(get_the_date()); ?></td>
                                     <td><?php echo esc_html($cats_txt); ?></td>
                                 </tr>

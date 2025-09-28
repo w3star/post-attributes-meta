@@ -29,24 +29,23 @@ class Summary
             return '<div class="owww-box owww-summary"><div class="owww-summary__title">Zusätzliche Informationen</div><ul class="owww-summary__list"><li>–</li></ul></div>';
         }
 
-        $rating       = (int) get_post_meta($post_id, Fields::rating(),      true);
-        $exclusivity  = (int) get_post_meta($post_id, Fields::exclusivity(),  true);
-        $durationMin  = (int) get_post_meta($post_id, Fields::duration(),     true);
-        $difficulty   = (string) get_post_meta($post_id, Fields::difficulty(), true);
+        $rating      = (int)    get_post_meta($post_id, Fields::rating(),      true);
+        $excl        = (int)    get_post_meta($post_id, Fields::exclusivity(),  true);
+        $durMinutes  = (int)    get_post_meta($post_id, Fields::duration(),     true);
+        $diffValue   = (string) get_post_meta($post_id, Fields::difficulty(),   true);
 
-        $diffCount   = Html::difficultyCount($difficulty);
-        $diffHtml    = $diffCount ? Html::iconGroup(Icons::mountain(), $diffCount) : '—';
-        $exclHtml    = $exclusivity ? Html::iconGroup(Icons::sun(), $exclusivity) : '—';
-        $durHtml     = '<span class="owww-icongroup">' . Icons::stopwatch() . '</span> ' . Html::durationText($durationMin);
+        $diffHtml = Html::difficultyIcons($diffValue);
+        $exclHtml = $excl ? Html::iconGroup(Icons::sun(), $excl) : '—';
+        $durHtml  = '<span class="owww-icongroup">' . Icons::stopwatch() . '</span> ' . Html::durationText($durMinutes);
 
         ob_start(); ?>
         <div class="owww-box owww-summary" role="group" aria-label="<?php esc_attr_e('Zusätzliche Informationen', 'outdoor-www'); ?>">
             <div class="owww-summary__title"><?php _e('Zusätzliche Informationen', 'outdoor-www'); ?></div>
             <ul class="owww-summary__list">
                 <li><span class="owww-label">Rating:</span> <?php echo Html::stars($rating); ?></li>
-                <li><span class="owww-label">Schwierigkeit:</span> <?php echo Html::difficultyLabel($diffHtml); ?></li>
-                <li><span class="owww-label">Exklusivität:</span> <?php echo $exclusivity; ?></li>
-                <li><span class="owww-label">Dauer:</span> <?php echo Html::durationText($durHtml); ?></li>
+                <li><span class="owww-label">Schwierigkeit:</span> <?php echo $diffHtml; ?></li>
+                <li><span class="owww-label">Exklusivität:</span> <?php echo $exclHtml; ?></li>
+                <li><span class="owww-label">Dauer:</span> <?php echo $durHtml; ?></li>
             </ul>
         </div>
 <?php
