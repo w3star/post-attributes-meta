@@ -10,27 +10,22 @@ final class Fields
 {
     public static function rating(): string
     {
-        return 'star_rating';
+        return 'owww_rating';
     }
-
-
-
-    public static function difficulty(): string
-    {
-        return 'star_difficulty';
-    }
-    
-    
-    
     public static function exclusivity(): string
     {
-        return 'star_exclusivity';
+        return 'owww_exclusivity';
     }
-    
-    
-    
     public static function duration(): string
     {
-        return 'star_time_relaxed';
+        return 'owww_time_relaxed';
     }
+    public static function difficulty(): string
+    {
+        return 'owww_difficulty_hiking';
+    }
+
+    // (optional) weitere Felder:
+    // public static function requirements(): string { return 'owww_requirements'; }
+    // public static function distance(): string     { return 'owww_distance'; }
 }

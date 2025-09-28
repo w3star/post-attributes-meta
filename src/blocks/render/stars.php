@@ -2,7 +2,6 @@
 
 namespace OutdoorWww\Blocks\Render;
 
-use OutdoorWww\Support\RenderUtils;
 use OutdoorWww\Support\Html;
 use OutdoorWww\Config\Fields;
 

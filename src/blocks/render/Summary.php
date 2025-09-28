@@ -29,24 +29,24 @@ class Summary
             return '<div class="owww-box owww-summary"><div class="owww-summary__title">Zusätzliche Informationen</div><ul class="owww-summary__list"><li>–</li></ul></div>';
         }
 
-        $star_rating       = (int) get_post_meta($post_id, 'star_rating', true);
-        $star_exclusivity  = (int) get_post_meta($post_id, 'star_exclusivity', true);
-        $star_time_relaxed = (int) get_post_meta($post_id, 'star_time_relaxed', true);
-        $star_difficulty   = (string) get_post_meta($post_id, 'star_difficulty', true);
+        $rating       = (int) get_post_meta($post_id, Fields::rating(),      true);
+        $exclusivity  = (int) get_post_meta($post_id, Fields::exclusivity(),  true);
+        $durationMin  = (int) get_post_meta($post_id, Fields::duration(),     true);
+        $difficulty   = (string) get_post_meta($post_id, Fields::difficulty(), true);
 
-        $diff_count   = Html::difficultyHiking_count($star_difficulty);
-        $difficulty   = $diff_count ? Html::iconGroup(Icons::mountain(), $diff_count) : '—';
-        $exclusivity       = $star_exclusivity ? Html::iconGroup(Icons::sun(), $star_exclusivity) : '—';
-        $durationText = '<span class="owww-icongroup">' . Icons::stopwatch() . '</span> ' . Html::durationText($star_time_relaxed);
+        $diffCount   = Html::difficultyCount($difficulty);
+        $diffHtml    = $diffCount ? Html::iconGroup(Icons::mountain(), $diffCount) : '—';
+        $exclHtml    = $exclusivity ? Html::iconGroup(Icons::sun(), $exclusivity) : '—';
+        $durHtml     = '<span class="owww-icongroup">' . Icons::stopwatch() . '</span> ' . Html::durationText($durationMin);
 
         ob_start(); ?>
         <div class="owww-box owww-summary" role="group" aria-label="<?php esc_attr_e('Zusätzliche Informationen', 'outdoor-www'); ?>">
             <div class="owww-summary__title"><?php _e('Zusätzliche Informationen', 'outdoor-www'); ?></div>
             <ul class="owww-summary__list">
-                <li><span class="owww-label">Rating:</span> <?php echo Html::stars($star_rating); ?></li>
-                <li><span class="owww-label">Schwierigkeit:</span> <?php echo $difficulty; ?></li>
+                <li><span class="owww-label">Rating:</span> <?php echo Html::stars($rating); ?></li>
+                <li><span class="owww-label">Schwierigkeit:</span> <?php echo Html::difficultyLabel($diffHtml); ?></li>
                 <li><span class="owww-label">Exklusivität:</span> <?php echo $exclusivity; ?></li>
-                <li><span class="owww-label">Dauer:</span> <?php echo $durationText; ?></li>
+                <li><span class="owww-label">Dauer:</span> <?php echo Html::durationText($durHtml); ?></li>
             </ul>
         </div>
 <?php

@@ -57,12 +57,16 @@ class Query
                 $orderby = ['date' => 'ASC'];
                 break;
             case 'rating_desc':
-                $meta_key = Fields::rating();
-                $orderby = ['meta_value_num' => 'DESC', 'date' => 'DESC'];
-                break;
             case 'rating_asc':
                 $meta_key = Fields::rating();
-                $orderby = ['meta_value_num' => 'ASC', 'date' => 'DESC'];
+                break;
+            case 'beauty_desc':
+            case 'beauty_asc':
+                $meta_key = Fields::exclusivity();
+                break;
+            case 'dur_asc':
+            case 'dur_desc':
+                $meta_key = Fields::duration();
                 break;
             case 'exclusivity_desc':
                 $meta_key = Fields::exclusivity();
@@ -72,28 +76,27 @@ class Query
                 $meta_key = Fields::exclusivity();
                 $orderby = ['meta_value_num' => 'ASC', 'date' => 'DESC'];
                 break;
-            case 'dur_asc':
-                $meta_key = Fields::duration();
-                $orderby = ['meta_value_num' => 'ASC', 'date' => 'DESC'];
-                break;
-            case 'dur_desc':
-                $meta_key = Fields::duration();
-                $orderby = ['meta_value_num' => 'DESC', 'date' => 'DESC'];
-                break;
             default:
                 $orderby = ['date' => 'DESC'];
         }
 
         $meta_query = [
             'relation' => 'AND',
-            ['key' => Fields::rating(),   'value' => $filters['min_rating'], 'compare' => '>=', 'type' => 'NUMERIC'],
-            ['key' => Fields::exclusivity(),   'value' => $filters['min_exclusivity'], 'compare' => '>=', 'type' => 'NUMERIC'],
-            ['key' => Fields::duration(), 'value' => [$filters['dur_from'], $filters['dur_to']], 'compare' => 'BETWEEN', 'type' => 'NUMERIC'],
+            ['key' => Fields::rating(),      'value' => $filters['min_rating'], 'compare' => '>=', 'type' => 'NUMERIC'],
+            ['key' => Fields::exclusivity(), 'value' => $filters['min_beauty'], 'compare' => '>=', 'type' => 'NUMERIC'],
+            ['key' => Fields::duration(),    'value' => [$filters['dur_from'], $filters['dur_to']], 'compare' => 'BETWEEN', 'type' => 'NUMERIC'],
         ];
-        if (count($filters['diff_vals']) < 6) {
-            $meta_query[] = ['key' => Fields::difficulty(), 'value' => $filters['diff_vals'], 'compare' => 'IN'];
+
+        if (count($filters['diff_vals']) < 3) {
+            $meta_query[] = [
+                'key'     => Fields::difficulty(),
+                'value'   => $filters['diff_vals'], // z.B. ['easy','medium'] – siehe dein Mapping
+                'compare' => 'IN',
+            ];
         }
 
+
+        
         $paged = max(1, (int)($_GET['owww_page'] ?? 1));
 
         $args = [
