@@ -2,6 +2,8 @@
 
 namespace OutdoorWww\Blocks\Render;
 
+use OutdoorWww\Support\Html;
+use OutdoorWww\Support\Icons;
 use OutdoorWww\Explorer\Query as ExplorerQuery;
 use OutdoorWww\Support\RenderUtils;
 
@@ -166,10 +168,10 @@ class Explorer
                             ?>
                                 <tr>
                                     <td><a href="<?php echo esc_url($perma); ?>"><?php echo esc_html($title); ?></a></td>
-                                    <td><?php echo RenderUtils::stars_html($rating); ?></td>
-                                    <td><?php echo $beauty ? RenderUtils::icons_group(RenderUtils::svg_sun(), $beauty) : '—'; ?></td>
+                                    <td><?php echo Html::stars($rating); ?></td>
+                                    <td><?php echo $beauty ? Html::iconGroup(Icons::sun(), $beauty) : '—'; ?></td>
+                                    <td><?php echo esc_html(Html::durationText($dur)); ?></td>
                                     <td><?php echo esc_html($diff_lbl); ?></td>
-                                    <td><?php echo esc_html(RenderUtils::duration_text($dur)); ?></td>
                                     <td><?php echo esc_html(get_the_date()); ?></td>
                                     <td><?php echo esc_html($cats_txt); ?></td>
                                 </tr>

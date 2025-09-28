@@ -3,41 +3,28 @@
 namespace OutdoorWww\Blocks\Render;
 
 use OutdoorWww\Support\RenderUtils;
+use OutdoorWww\Support\Html;
 
 class Stars
 {
     public static function render(array $attributes, string $content, $block): string
     {
-        wp_enqueue_style('owww-stars-style');
+        wp_enqueue_style('pam-stars-style');
 
-        // robust Post-ID (Editor, Frontend, Query-Loop)
         $post_id = 0;
-
-        if (is_object($block) && !empty($block->context['postId'])) {
-            $post_id = (int) $block->context['postId'];
-        }
-        
+        if (is_object($block) && !empty($block->context['postId'])) $post_id = (int)$block->context['postId'];
         if (!$post_id) {
             $qid = get_queried_object_id();
-            if ($qid) $post_id = (int) $qid;
+            if ($qid) $post_id = (int)$qid;
         }
-        
-        if (!$post_id) {
-            global $post;
-            if ($post && !empty($post->ID)) $post_id = (int) $post->ID;
-        }
-        
+        if (!$post_id && isset($GLOBALS['post']->ID)) $post_id = (int)$GLOBALS['post']->ID;
         if (!$post_id) {
             $tmp = get_the_ID();
-            if ($tmp) $post_id = (int) $tmp;
+            if ($tmp) $post_id = (int)$tmp;
         }
 
-        if (!$post_id) {
-            return '<div class="owww-stars">' . RenderUtils::stars_html(0) . '</div>';
-        }
+        $rating = $post_id ? (int) get_post_meta($post_id, 'star_rating', true) : 0;
 
-        $rating = (int) get_post_meta($post_id, 'owww_rating', true);
-
-        return '<div class="owww-stars">' . RenderUtils::stars_html($rating) . '</div>';
+        return '<div class="owww-stars">' . Html::stars($rating) . '</div>';
     }
 }

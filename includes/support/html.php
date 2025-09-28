@@ -39,7 +39,7 @@ final class Html
 
 
 
-    public static function difficultyHikingCount(string $diff): int
+    public static function difficultyHiking_count(string $diff): int
     {
         return $diff === 'T6' ? 6 : ($diff === 'T5' ? 5 : ($diff === 'T4' ? 4 : ($diff === 'T3' ? 3 : ($diff === 'T2' ? 2 : ($diff === 'T1' ? 1 : 0)))));
     }

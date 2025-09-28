@@ -71,7 +71,7 @@ class RenderUtils
 
 
 
-    public static function difficultyCount(string $diff): int
+    public static function difficultyHiking_count(string $diff): int
     {
         return $diff === 'hard' ? 3 : ($diff === 'medium' ? 2 : ($diff === 'easy' ? 1 : 0));
     }
