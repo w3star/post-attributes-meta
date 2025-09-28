@@ -46,7 +46,7 @@ class Explorer
                 'title'            => ['title_asc', 'title_desc'],
                 'date'             => ['date_asc', 'date_desc'],
                 'owww_rating'      => ['rating_asc', 'rating_desc'],
-                'owww_exclusivity' => ['beauty_asc', 'beauty_desc'],
+                'owww_exclusivity' => ['exclusivity_asc', 'exclusivity_desc'],
                 'dur'              => ['dur_asc', 'dur_desc'],
             ];
             $pair = $pairs[$key] ?? ['date_asc', 'date_desc'];
@@ -73,8 +73,8 @@ class Explorer
             'date_asc'    => __('Älteste zuerst', 'outdoor-www'),
             'rating_desc' => __('Rating absteigend', 'outdoor-www'),
             'rating_asc'  => __('Rating aufsteigend', 'outdoor-www'),
-            'beauty_desc' => __('Exklusivität absteigend', 'outdoor-www'),
-            'beauty_asc'  => __('Exklusivität aufsteigend', 'outdoor-www'),
+            'exclusivity_desc' => __('Exklusivität absteigend', 'outdoor-www'),
+            'exclusivity_asc'  => __('Exklusivität aufsteigend', 'outdoor-www'),
             'dur_asc'     => __('Dauer: kürzeste zuerst', 'outdoor-www'),
             'dur_desc'    => __('Dauer: längste zuerst', 'outdoor-www'),
         ];
@@ -94,8 +94,8 @@ class Explorer
                 </label>
 
                 <label>Min. Exklusivität
-                    <input type="range" name="min_beauty" min="0" max="5" step="1" value="<?php echo esc_attr($f['min_beauty']); ?>" aria-label="Minimale Exklusivität (0 bis 5)" />
-                    <output data-out="min_beauty"><?php echo esc_html($f['min_beauty']); ?></output>
+                    <input type="range" name="min_exclusivity" min="0" max="5" step="1" value="<?php echo esc_attr($f['min_exclusivity']); ?>" aria-label="Minimale Exklusivität (0 bis 5)" />
+                    <output data-out="min_exclusivity"><?php echo esc_html($f['min_exclusivity']); ?></output>
                 </label>
 
                 <label>Schwierigkeit (von/bis)
@@ -159,7 +159,7 @@ class Explorer
                                 $title = get_the_title();
                                 $perma = get_permalink();
                                 $rating = (int) get_post_meta($pid, 'owww_rating', true);
-                                $beauty = (int) get_post_meta($pid, 'owww_exclusivity', true);
+                                $exclusivity = (int) get_post_meta($pid, 'owww_exclusivity', true);
                                 $dur    = (int) get_post_meta($pid, 'owww_time_relaxed', true);
                                 $diff   = (string) get_post_meta($pid, 'owww_difficulty_hiking', true);
                                 $diff_lbl = $diff === 'T6' ? 'T6' : ($diff === 'T5' ? 'T5' : ($diff === 'T4' ? 'T4' : ($diff === 'T3' ? 'T3' : ($diff === 'T2' ? 'T2' : ($diff === 'T1' ? 'T1' : '—')))));
@@ -169,7 +169,7 @@ class Explorer
                                 <tr>
                                     <td><a href="<?php echo esc_url($perma); ?>"><?php echo esc_html($title); ?></a></td>
                                     <td><?php echo Html::stars($rating); ?></td>
-                                    <td><?php echo $beauty ? Html::iconGroup(Icons::sun(), $beauty) : '—'; ?></td>
+                                    <td><?php echo $exclusivity ? Html::iconGroup(Icons::sun(), $exclusivity) : '—'; ?></td>
                                     <td><?php echo esc_html(Html::durationText($dur)); ?></td>
                                     <td><?php echo esc_html($diff_lbl); ?></td>
                                     <td><?php echo esc_html(get_the_date()); ?></td>

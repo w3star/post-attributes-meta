@@ -4,6 +4,7 @@ namespace OutdoorWww\Blocks\Render;
 
 use OutdoorWww\Support\RenderUtils;
 use OutdoorWww\Support\Html;
+use OutdoorWww\Config\Fields;
 
 class Stars
 {
@@ -23,8 +24,7 @@ class Stars
             if ($tmp) $post_id = (int)$tmp;
         }
 
-        $rating = $post_id ? (int) get_post_meta($post_id, 'star_rating', true) : 0;
-
+        $rating = $post_id ? (int) get_post_meta($post_id, Fields::rating(), true) : 0;
         return '<div class="owww-stars">' . Html::stars($rating) . '</div>';
     }
 }

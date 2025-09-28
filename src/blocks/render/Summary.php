@@ -2,6 +2,7 @@
 
 namespace OutdoorWww\Blocks\Render;
 
+use OutdoorWww\Config\Fields;
 use OutdoorWww\Support\Html;
 use OutdoorWww\Support\Icons;
 
@@ -35,7 +36,7 @@ class Summary
 
         $diff_count   = Html::difficultyHiking_count($star_difficulty);
         $difficulty   = $diff_count ? Html::iconGroup(Icons::mountain(), $diff_count) : '—';
-        $beauty       = $star_exclusivity ? Html::iconGroup(Icons::sun(), $star_exclusivity) : '—';
+        $exclusivity       = $star_exclusivity ? Html::iconGroup(Icons::sun(), $star_exclusivity) : '—';
         $durationText = '<span class="owww-icongroup">' . Icons::stopwatch() . '</span> ' . Html::durationText($star_time_relaxed);
 
         ob_start(); ?>
@@ -44,7 +45,7 @@ class Summary
             <ul class="owww-summary__list">
                 <li><span class="owww-label">Rating:</span> <?php echo Html::stars($star_rating); ?></li>
                 <li><span class="owww-label">Schwierigkeit:</span> <?php echo $difficulty; ?></li>
-                <li><span class="owww-label">Exklusivität:</span> <?php echo $beauty; ?></li>
+                <li><span class="owww-label">Exklusivität:</span> <?php echo $exclusivity; ?></li>
                 <li><span class="owww-label">Dauer:</span> <?php echo $durationText; ?></li>
             </ul>
         </div>

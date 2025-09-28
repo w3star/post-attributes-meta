@@ -8,9 +8,9 @@
   ready(function () {
     const forms = document.querySelectorAll('.owww-explorer--sliders [data-minmax-form]');
 
-    // Single-Slider (Rating/Beauty)
+    // Single-Slider (Rating/exclusivity)
     forms.forEach(function (form) {
-      ['min_rating', 'min_beauty'].forEach(function (name) {
+      ['min_rating', 'min_exclusivity'].forEach(function (name) {
         const range = form.querySelector('input[name="' + name + '"]');
         const out = (range && (range.closest('label') || form).querySelector('output[data-out="' + name + '"]')) || null;
         if (!range || !out) return;
