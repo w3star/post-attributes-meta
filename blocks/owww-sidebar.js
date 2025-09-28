@@ -24,75 +24,77 @@
     };
 
     function FieldControl({ field, meta, editMeta }) {
-        const key = field.key;
-        const val = meta[key];
+  const key = field.key;
+  const raw = meta[key];
+  const type = field.type || 'text';            // 'int' | 'text'
+  const widget = field.widget || (type === 'int' ? 'range' : 'input'); // 'select' | 'range' | 'input'
+  const toInt = (v) => {
+    const n = parseInt(v, 10);
+    return isNaN(n) ? 0 : n;
+  };
 
-        switch (field.type) {
-            case 'int': {
-                const min = field.min ?? 0, max = field.max ?? 99999, step = field.step ?? 1;
-                const coerce = (v) => {
-                    const n = parseInt(v, 10);
-                    if (isNaN(n)) return min;
-                    return Math.max(min, Math.min(max, n));
-                };
+  // ---- SELECT (immer Strings) ----
+  if (widget === 'select') {
+    const opts = (field.options || []).map(o => ({ label: o.label, value: String(o.value) }));
+    const val = (raw ?? '');
+    return wp.element.createElement(
+      wp.components.PanelRow,
+      null,
+      wp.element.createElement(wp.components.SelectControl, {
+        label: field.label || key,
+        value: String(val),
+        options: opts,
+        onChange: (next) => editMeta({ [key]: String(next) }),
+      })
+    );
+  }
 
-                // Wenn widget === 'input' → Zahleneingabe; sonst Slider
-                if (field.widget === 'input') {
-                    // Nutze NumberControl wenn verfügbar, sonst TextControl-Fallback
-                    const NumberControl = wp.components.__experimentalNumberControl;
-                    const Control = NumberControl || wp.components.TextControl;
+  // ---- NUMERIC INPUT (kompakt, Label + Feld nebeneinander) ----
+  if (widget === 'input' && type === 'int') {
+    const NumberControl = wp.components.__experimentalNumberControl;
+    const Control = NumberControl || wp.components.TextControl;
+    const min = field.min ?? 0, max = field.max ?? 999999, step = field.step ?? 1;
+    return wp.element.createElement(
+      wp.components.PanelRow,
+      null,
+      wp.element.createElement('span', { className: 'owww-fieldlabel' }, field.label || key),
+      wp.element.createElement(Control, {
+        label: undefined,
+        value: raw ?? '',
+        onChange: (next) => editMeta({ [key]: toInt(next) }),
+        ...(NumberControl ? { min, max, step } : { inputMode: 'numeric', pattern: '[0-9]*' }),
+        className: 'owww-number-inline'
+      })
+    );
+  }
 
-                    // Inline-Layout: Label + Eingabe nebeneinander
-                    return wp.element.createElement(
-                        wp.components.PanelRow,
-                        null,
-                        wp.element.createElement('span', { className: 'owww-fieldlabel' }, field.label || field.key),
-                        wp.element.createElement(Control, {
-                            label: undefined,
-                            value: (val ?? ''),
-                            onChange: (next) => editMeta({ [key]: coerce(next) }),
-                            ...(NumberControl ? { min, max, step } : { inputMode: 'numeric', pattern: '[0-9]*' }),
-                            className: 'owww-number-inline'
-                        })
-                    );
-                }
+  // ---- RANGE SLIDER (Fallback für int) ----
+  if (widget === 'range' && type === 'int') {
+    const min = field.min ?? 0, max = field.max ?? 100, step = field.step ?? 1;
+    return wp.element.createElement(
+      wp.components.PanelRow,
+      null,
+      wp.element.createElement(wp.components.RangeControl, {
+        label: field.label || key,
+        value: toInt(raw),
+        min, max, step,
+        onChange: (next) => editMeta({ [key]: toInt(next) }),
+      })
+    );
+  }
 
-                // Standard: Slider
-                return wp.element.createElement(
-                    wp.components.PanelRow,
-                    null,
-                    wp.element.createElement(wp.components.RangeControl, {
-                        label: field.label || key,
-                        value: coerce(val),
-                        min, max, step,
-                        onChange: (next) => editMeta({ [key]: coerce(next) })
-                    })
-                );
-            }
+  // ---- TEXT (Fallback) ----
+  return wp.element.createElement(
+    wp.components.PanelRow,
+    null,
+    wp.element.createElement(wp.components.TextControl, {
+      label: field.label || key,
+      value: raw ?? '',
+      onChange: (next) => editMeta({ [key]: next })
+    })
+  );
+}
 
-            case 'select':
-                return h(PanelRow, {},
-                    h(SelectControl, {
-                        label: field.label || key,
-                        value: (val ?? ''),
-                        options: (field.options || []).map(o => ({ label: o.label, value: o.value })),
-                        onChange: (next) => editMeta({ [key]: next }),
-                    })
-                );
-
-            case 'text':
-                return h(PanelRow, {},
-                    h(TextControl, {
-                        label: field.label || key,
-                        value: val ?? '',
-                        onChange: (next) => editMeta({ [key]: next }),
-                    })
-                );
-
-            default:
-                return h('div', { style: { opacity: .7, fontStyle: 'italic' } }, `Unbekannter Feldtyp: ${field.type}`);
-        }
-    }
 
     function SectionPanel({ section }) {
         const meta = useSelect((select) => select('core/editor').getEditedPostAttribute('meta') || {}, []);

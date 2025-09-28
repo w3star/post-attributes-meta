@@ -18,7 +18,11 @@ class Summary
         $owww_time_relaxed = (int) get_post_meta($post_id, 'owww_time_relaxed', true);
         $owww_difficulty_hiking   = (string) get_post_meta($post_id, 'owww_difficulty_hiking', true);
 
-        $diff_count = $owww_difficulty_hiking === 'T6' ? 6 : ($owww_difficulty_hiking === 'T5' ? 5 : ($owww_difficulty_hiking === 'T4' ? 4 : ($owww_difficulty_hiking === 'T3' ? 3 : ($owww_difficulty_hiking === 'T2' ? 2 : ($owww_difficulty_hiking === 'T1' ? 1 : 0)))));
+        $diff_count = Html::difficultyHikingCount($star_difficulty);
+        $mountains  = $diff_count ? Html::iconGroup(Icons::mountain(), $diff_count) : '—';
+        $suns       = $star_exclusivity ? Html::iconGroup(Icons::sun(), $star_exclusivity) : '—';
+        $duration   = '<span class="owww-icongroup">' . Icons::stopwatch() . '</span> ' . Html::durationText($star_time_relaxed);
+
         $mountains_html = $diff_count ? RenderUtils::icons_group(RenderUtils::svg_mountain(), $diff_count) : '—';
         $suns_html      = $owww_exclusivity ? RenderUtils::icons_group(RenderUtils::svg_sun(), $owww_exclusivity) : '—';
         $duration_html  = '<span class="owww-icongroup">' . RenderUtils::svg_stopwatch() . '</span> ' . RenderUtils::duration_text($owww_time_relaxed);

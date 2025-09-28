@@ -41,9 +41,19 @@ define('OUTDOOR_WWW_URL',  plugin_dir_url(__FILE__));
 spl_autoload_register(function ($class) {
     if (strpos($class, 'OutdoorWww\\') !== 0) return;
     $rel = str_replace(['OutdoorWww\\', '\\'], ['', '/'], $class);
-    $file = __DIR__ . '/src/' . $rel . '.php';
-    if (is_file($file)) require $file;
+
+    $candidates = [
+        __DIR__ . '/src/' . $rel . '.php',
+        __DIR__ . '/includes/' . $rel . '.php',
+    ];
+    foreach ($candidates as $file) {
+        if (is_file($file)) {
+            require $file;
+            return;
+        }
+    }
 });
+
 
 
 
