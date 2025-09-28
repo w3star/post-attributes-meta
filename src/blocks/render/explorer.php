@@ -128,9 +128,16 @@ class Explorer
                 </label>
 
                 <label>Min. Exklusivität
-                    <input type="range" name="min_exclusivity" min="0" max="5" step="1" value="<?php echo esc_attr($f['min_exclusivity']); ?>" aria-label="Minimale Exklusivität (0 bis 5)" />
-                    <output data-out="min_exclusivity"><?php echo esc_html($f['min_exclusivity']); ?></output>
+                    <input type="range"
+                        name="min_exclusivity" <!-- der Param-Name bleibt so -->
+                    min="0" max="5" step="1"
+                    value="<?php echo esc_attr($f['min_excl'] ?? 0); ?>" <!-- HIER -->
+                    aria-label="Minimale Exklusivität (0 bis 5)"
+                    <output data-out="min_exclusivity">
+                        <?php echo esc_html($f['min_excl'] ?? 0); ?> <!-- UND HIER -->
+                    </output>
                 </label>
+
 
                 <label>Schwierigkeit (von/bis)
                     <div class="minmax" data-field="owww_difficulty_hiking" data-min="1" data-max="6" data-step="1">
