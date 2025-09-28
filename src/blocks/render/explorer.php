@@ -129,12 +129,12 @@ class Explorer
 
                 <label>Min. Exklusivität
                     <input type="range"
-                        name="min_exclusivity" <!-- der Param-Name bleibt so -->
-                    min="0" max="5" step="1"
-                    value="<?php echo esc_attr($f['min_excl'] ?? 0); ?>" <!-- HIER -->
-                    aria-label="Minimale Exklusivität (0 bis 5)"
-                    <output data-out="min_exclusivity">
-                        <?php echo esc_html($f['min_excl'] ?? 0); ?> <!-- UND HIER -->
+                        name="min_exclusivity"
+                        min="0" max="5" step="1"
+                        value="<?php echo esc_attr($f['min_excl'] ?? 0); ?>"
+                        aria-label="Minimale Exklusivität (0 bis 5)">
+                    <output data-out="min_exclusivity" >
+                        <?php echo esc_html($f['min_excl'] ?? 0); ?>
                     </output>
                 </label>
 
