@@ -103,14 +103,14 @@ class ClassicMetaBox
     {
         // kleine Heuristik → sprechende Labels ohne Übersetzungsaufwand
         $map = [
-            'star_rating'       => __('Rating', 'outdoor-www'),
-            'star_exclusivity'  => __('Exklusivität', 'outdoor-www'),
-            'star_difficulty_hiking'   => __('Schwierigkeit', 'outdoor-www'),
-            'star_time_relaxed' => __('Dauer (Minuten)', 'outdoor-www'),
+            'owww_rating'       => __('Rating', 'outdoor-www'),
+            'owww_exclusivity'  => __('Exklusivität', 'outdoor-www'),
+            'owww_difficulty_hiking'   => __('Schwierigkeit', 'outdoor-www'),
+            'owww_time_relaxed' => __('Dauer (Minuten)', 'outdoor-www'),
         ];
         if (isset($map[$key])) return $map[$key];
 
-        $k = preg_replace('/^star_/', '', $key);
+        $k = preg_replace('/^owww_/', '', $key);
         $k = str_replace('_', ' ', $k);
         return ucfirst($k);
     }

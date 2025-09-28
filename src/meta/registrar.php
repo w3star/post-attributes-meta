@@ -69,22 +69,22 @@ class Registrar
 
         // Feinschliff per Schlüssel
         switch ($key) {
-            case 'star_rating':        // 0..5
-            case 'star_exclusivity':   // 0..5
+            case 'owww_rating':        // 0..5
+            case 'owww_exclusivity':   // 0..5
                 return max(0, min(5, (int)$value));
 
-            case 'star_time_relaxed':
-            case 'star_time_steady':
-            case 'star_time_moderate':
-            case 'star_time_fast':
-            case 'star_time_veryfast':
+            case 'owww_time_relaxed':
+            case 'owww_time_steady':
+            case 'owww_time_moderate':
+            case 'owww_time_fast':
+            case 'owww_time_veryfast':
                 // Minuten >= 0, optional harte Obergrenze (hier 10080 = 7 Tage)
                 $v = (int)$value;
                 return $v < 0 ? 0 : min($v, 10080);
 
-            case 'star_difficulty_hiking':
+            case 'owww_difficulty_hiking':
                 $v = (string)$value;
-                $allowed = ['', 'easy', 'medium', 'hard'];
+                $allowed = ['', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
                 return in_array($v, $allowed, true) ? $v : '';
 
             default:

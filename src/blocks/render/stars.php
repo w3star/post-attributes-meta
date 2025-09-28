@@ -8,7 +8,7 @@ class Stars
 {
     public static function render(array $attributes, string $content, $block): string
     {
-        wp_enqueue_style('pam-stars-style');
+        wp_enqueue_style('owww-stars-style');
 
         // robust Post-ID (Editor, Frontend, Query-Loop)
         $post_id = 0;
@@ -33,11 +33,11 @@ class Stars
         }
 
         if (!$post_id) {
-            return '<div class="pam-stars">' . RenderUtils::stars_html(0) . '</div>';
+            return '<div class="owww-stars">' . RenderUtils::stars_html(0) . '</div>';
         }
 
-        $rating = (int) get_post_meta($post_id, 'star_rating', true);
+        $rating = (int) get_post_meta($post_id, 'owww_rating', true);
 
-        return '<div class="pam-stars">' . RenderUtils::stars_html($rating) . '</div>';
+        return '<div class="owww-stars">' . RenderUtils::stars_html($rating) . '</div>';
     }
 }

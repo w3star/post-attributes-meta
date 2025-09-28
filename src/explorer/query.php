@@ -17,14 +17,14 @@ class Query
         $diff_vals = [];
         for ($i=$d_from_i; $i<=$d_to_i; $i++) $diff_vals[] = $idx2lab[$i];
 
-        $dur_from = isset($_GET['dur_from']) ? max(0, min(720, (int)$_GET['dur_from'])) : 0;
-        $dur_to   = isset($_GET['dur_to'])   ? max(0, min(720, (int)$_GET['dur_to']))   : 720;
+        $dur_from = isset($_GET['dur_from']) ? max(0, min(4000, (int)$_GET['dur_from'])) : 0;
+        $dur_to   = isset($_GET['dur_to'])   ? max(0, min(4000, (int)$_GET['dur_to']))   : 4000;
         if ($dur_from > $dur_to) { $t=$dur_from; $dur_from=$dur_to; $dur_to=$t; }
 
         $cats_raw = isset($_GET['cats']) ? (array)$_GET['cats'] : [];
         $cats = array_filter(array_map('intval', $cats_raw));
 
-        $sort = isset($_GET['star_sort']) ? sanitize_text_field($_GET['star_sort']) : 'date_desc';
+        $sort = isset($_GET['owww_sort']) ? sanitize_text_field($_GET['owww_sort']) : 'date_desc';
 
         return compact('min_rating','min_beauty','d_from_i','d_to_i','diff_vals','dur_from','dur_to','cats','sort');
     }
@@ -38,26 +38,26 @@ class Query
             case 'title_asc':  $orderby=['title'=>'ASC'];  break;
             case 'title_desc': $orderby=['title'=>'DESC']; break;
             case 'date_asc':   $orderby=['date'=>'ASC'];   break;
-            case 'rating_desc': $meta_key='star_rating';        $orderby=['meta_value_num'=>'DESC','date'=>'DESC']; break;
-            case 'rating_asc':  $meta_key='star_rating';        $orderby=['meta_value_num'=>'ASC','date'=>'DESC'];  break;
-            case 'beauty_desc': $meta_key='star_exclusivity';   $orderby=['meta_value_num'=>'DESC','date'=>'DESC']; break;
-            case 'beauty_asc':  $meta_key='star_exclusivity';   $orderby=['meta_value_num'=>'ASC','date'=>'DESC'];  break;
-            case 'dur_asc':     $meta_key='star_time_relaxed';  $orderby=['meta_value_num'=>'ASC','date'=>'DESC'];  break;
-            case 'dur_desc':    $meta_key='star_time_relaxed';  $orderby=['meta_value_num'=>'DESC','date'=>'DESC']; break;
+            case 'rating_desc': $meta_key='owww_rating';        $orderby=['meta_value_num'=>'DESC','date'=>'DESC']; break;
+            case 'rating_asc':  $meta_key='owww_rating';        $orderby=['meta_value_num'=>'ASC','date'=>'DESC'];  break;
+            case 'beauty_desc': $meta_key='owww_exclusivity';   $orderby=['meta_value_num'=>'DESC','date'=>'DESC']; break;
+            case 'beauty_asc':  $meta_key='owww_exclusivity';   $orderby=['meta_value_num'=>'ASC','date'=>'DESC'];  break;
+            case 'dur_asc':     $meta_key='owww_time_relaxed';  $orderby=['meta_value_num'=>'ASC','date'=>'DESC'];  break;
+            case 'dur_desc':    $meta_key='owww_time_relaxed';  $orderby=['meta_value_num'=>'DESC','date'=>'DESC']; break;
             default:            $orderby=['date'=>'DESC'];
         }
 
         $meta_query = [
             'relation'=>'AND',
-            ['key'=>'star_rating',       'value'=>$filters['min_rating'], 'compare'=>'>=','type'=>'NUMERIC'],
-            ['key'=>'star_exclusivity',  'value'=>$filters['min_beauty'], 'compare'=>'>=','type'=>'NUMERIC'],
-            ['key'=>'star_time_relaxed', 'value'=>[$filters['dur_from'],$filters['dur_to']], 'compare'=>'BETWEEN', 'type'=>'NUMERIC'],
+            ['key'=>'owww_rating',       'value'=>$filters['min_rating'], 'compare'=>'>=','type'=>'NUMERIC'],
+            ['key'=>'owww_exclusivity',  'value'=>$filters['min_beauty'], 'compare'=>'>=','type'=>'NUMERIC'],
+            ['key'=>'owww_time_relaxed', 'value'=>[$filters['dur_from'],$filters['dur_to']], 'compare'=>'BETWEEN', 'type'=>'NUMERIC'],
         ];
         if (count($filters['diff_vals']) < 3) {
-            $meta_query[] = ['key'=>'star_difficulty_hiking','value'=>$filters['diff_vals'],'compare'=>'IN'];
+            $meta_query[] = ['key'=>'owww_difficulty_hiking','value'=>$filters['diff_vals'],'compare'=>'IN'];
         }
 
-        $paged = max(1, (int)($_GET['star_page'] ?? 1));
+        $paged = max(1, (int)($_GET['owww_page'] ?? 1));
 
         $args = [
             'post_type'      => 'post',

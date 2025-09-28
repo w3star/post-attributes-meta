@@ -14,9 +14,9 @@ class Registrar
     public function registerFrontendAssets(): void
     {
         // Styles (wie zuvor in register_view_assets)
-        wp_register_style('pam-summary-style',  plugins_url('blocks/pam-summary/style.css', OUTDOOR_WWW_FILE), [], OUTDOOR_WWW_VERSION);
-        wp_register_style('pam-stars-style',    plugins_url('blocks/pam-stars/style.css',   OUTDOOR_WWW_FILE), [], OUTDOOR_WWW_VERSION);
-        wp_register_style('pam-explorer-style', plugins_url('blocks/pam-explorer/style.css',OUTDOOR_WWW_FILE), [], OUTDOOR_WWW_VERSION);
+        wp_register_style('owww-summary-style',  plugins_url('blocks/owww-summary/style.css', OUTDOOR_WWW_FILE), [], OUTDOOR_WWW_VERSION);
+        wp_register_style('owww-stars-style',    plugins_url('blocks/owww-stars/style.css',   OUTDOOR_WWW_FILE), [], OUTDOOR_WWW_VERSION);
+        wp_register_style('owww-explorer-style', plugins_url('blocks/owww-explorer/style.css',OUTDOOR_WWW_FILE), [], OUTDOOR_WWW_VERSION);
         // WICHTIG: view.js kommt über block.json::viewScript – kein doppeltes Enqueue
     }
 

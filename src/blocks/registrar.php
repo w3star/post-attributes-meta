@@ -20,8 +20,8 @@ class Registrar
     {
         // Summary (bereits vorhanden)
         wp_register_script(
-            'pam-summary-editor',
-            plugins_url('blocks/pam-summary/index.js', OUTDOOR_WWW_FILE),
+            'owww-summary-editor',
+            plugins_url('blocks/owww-summary/index.js', OUTDOOR_WWW_FILE),
             ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-data', 'wp-core-data', 'wp-i18n'],
             defined('OUTDOOR_WWW_VERSION') ? OUTDOOR_WWW_VERSION : false,
             true
@@ -29,8 +29,8 @@ class Registrar
 
         // ⭐ Stars (NEU)
         wp_register_script(
-            'pam-stars-editor',
-            plugins_url('blocks/pam-stars/index.js', OUTDOOR_WWW_FILE),
+            'owww-stars-editor',
+            plugins_url('blocks/owww-stars/index.js', OUTDOOR_WWW_FILE),
             ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'],
             defined('OUTDOOR_WWW_VERSION') ? OUTDOOR_WWW_VERSION : false,
             true
@@ -38,8 +38,8 @@ class Registrar
 
         // Explorer (NEU)
         wp_register_script(
-            'pam-explorer-editor',
-            plugins_url('blocks/pam-explorer/index.js', OUTDOOR_WWW_FILE),
+            'owww-explorer-editor',
+            plugins_url('blocks/owww-explorer/index.js', OUTDOOR_WWW_FILE),
             ['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'],
             defined('OUTDOOR_WWW_VERSION') ? OUTDOOR_WWW_VERSION : false,
             true
@@ -49,23 +49,23 @@ class Registrar
     public function register_blocks(): void
     {
         // Summary (bestehend)
-        register_block_type(plugin_dir_path(OUTDOOR_WWW_FILE) . 'blocks/pam-summary', [
-            'editor_script'   => 'pam-summary-editor',
-            'style'           => 'pam-summary-style',
+        register_block_type(plugin_dir_path(OUTDOOR_WWW_FILE) . 'blocks/owww-summary', [
+            'editor_script'   => 'owww-summary-editor',
+            'style'           => 'owww-summary-style',
             'render_callback' => [Summary::class, 'render'],
         ]);
 
         // ⭐ Stars (NEU)
-        register_block_type(plugin_dir_path(OUTDOOR_WWW_FILE) . 'blocks/pam-stars', [
-            'editor_script'   => 'pam-stars-editor',
-            'style'           => 'pam-stars-style',
+        register_block_type(plugin_dir_path(OUTDOOR_WWW_FILE) . 'blocks/owww-stars', [
+            'editor_script'   => 'owww-stars-editor',
+            'style'           => 'owww-stars-style',
             'render_callback' => [Stars::class, 'render'],
         ]);
 
         // Explorer (NEU)
-        register_block_type(plugin_dir_path(OUTDOOR_WWW_FILE) . 'blocks/pam-explorer', [
-            'editor_script'   => 'pam-explorer-editor',
-            'style'           => 'pam-explorer-style',
+        register_block_type(plugin_dir_path(OUTDOOR_WWW_FILE) . 'blocks/owww-explorer', [
+            'editor_script'   => 'owww-explorer-editor',
+            'style'           => 'owww-explorer-style',
             // KEIN 'script' → view.js kommt aus block.json::viewScript
             'render_callback' => [Explorer::class, 'render'],
         ]);

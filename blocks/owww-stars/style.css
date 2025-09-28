@@ -1,0 +1,10 @@
+.owww-stars .owww-icon {
+    width: 1.15em;
+    height: 1.15em;
+    fill: currentColor
+}
+
+.owww-stars .owww-icongroup {
+    display: inline-flex;
+    gap: 3px
+}

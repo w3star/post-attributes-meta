@@ -20,39 +20,42 @@
     }, [meta]);
 
     function handleDifficulty(value){
-      setMeta('star_difficulty_hiking', value);
+      setMeta('owww_difficulty_hiking', value);
     }
 
-    return el( PluginDocumentSettingPanel, { name:'pam-panel', title:'Zusatzinfos', className:'pam-panel' },
+    return el( PluginDocumentSettingPanel, { name:'owww-panel', title:'Zusatzinfos', className:'owww-panel' },
       el( NumberControl, {
         label: 'Rating (0–5)', min:0, max:5, step:1,
-        value: meta.star_rating || 0,
-        onChange: v => setMeta('star_rating', parseInt(v||0,10))
+        value: meta.owww_rating || 0,
+        onChange: v => setMeta('owww_rating', parseInt(v||0,10))
       } ),
       el( SelectControl, {
         label: 'Schwierigkeit',
-        value: meta.star_difficulty_hiking || '',
+        value: meta.owww_difficulty_hiking || '',
         options: [
           { label: '—', value: '' },
-          { label: 'Leicht', value: 'easy' },
-          { label: 'Mittel', value: 'medium' },
-          { label: 'Schwer', value: 'hard' },
+          { label: 'Wandern', value: 'T1' },
+          { label: 'Bergwandern', value: 'T2' },
+          { label: 'anspruchsvolles Bergwandern', value: 'T3' },
+          { label: 'Alpinwandern', value: 'T4' },
+          { label: 'anspruchsvolles Alpinwandern', value: 'T5' },
+          { label: 'schwierieges Alpinwandern', value: 'T6' },
         ],
         onChange: handleDifficulty,
         __nextHasNoMarginBottom: true
       } ),
       el( NumberControl, {
         label: 'Exklusivität (0–5)', min:0, max:5, step:1,
-        value: meta.star_exclusivity || 0,
-        onChange: v => setMeta('star_exclusivity', parseInt(v||0,10))
+        value: meta.owww_exclusivity || 0,
+        onChange: v => setMeta('owww_exclusivity', parseInt(v||0,10))
       } ),
       el( NumberControl, {
         label: 'Dauer (Minuten)', min:0, step:10,
-        value: meta.star_time_relaxed || 0,
-        onChange: v => setMeta('star_time_relaxed', parseInt(v||0,10))
+        value: meta.owww_time_relaxed || 0,
+        onChange: v => setMeta('owww_time_relaxed', parseInt(v||0,10))
       } )
     );
   }
 
-  registerPlugin( 'pam-panel', { render: Panel, icon: 'info' } );
+  registerPlugin( 'owww-panel', { render: Panel, icon: 'info' } );
 } )( window.wp );

@@ -1,0 +1,42 @@
+.owww-summary {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 14px 16px
+}
+
+.owww-summary__title {
+    font-weight: 600;
+    margin-bottom: 8px
+}
+
+.owww-summary__list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none
+}
+
+.owww-summary__list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0
+}
+
+.owww-summary__list .owww-label {
+    min-width: 130px;
+    font-weight: 500;
+    color: inherit
+}
+
+.owww-icon {
+    width: 1.15em;
+    height: 1.15em;
+    display: inline-block;
+    vertical-align: -.15em;
+    fill: currentColor
+}
+
+.owww-icongroup {
+    display: inline-flex;
+    gap: 3px
+}

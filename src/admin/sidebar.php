@@ -40,14 +40,14 @@ class Sidebar
         // Sidebar-Script (unser Panel)
         wp_register_script(
             'owww-sidebar',
-            plugins_url('blocks/pam-sidebar.js', dirname(__DIR__, 2) . '/outdoor-www.php'),
+            plugins_url('blocks/owww-sidebar.js', dirname(__DIR__, 2) . '/outdoor-www.php'),
             ['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-editor', 'wp-i18n'],
             defined('OUTDOOR_WWW_VERSION') ? OUTDOOR_WWW_VERSION : false,
             true
         );
 
         // Konfiguration ins Script schieben
-        wp_localize_script('owww-sidebar', 'PAM_SECTIONS', $this->sections);
+        wp_localize_script('owww-sidebar', 'OWWW_SECTIONS', $this->sections);
 
         wp_enqueue_script('owww-sidebar');
 
@@ -78,6 +78,7 @@ class Sidebar
             }
             $byGroup[$g]['fields'][] = $field;
         }
+        
         // Titel einsetzen
         $sections = [];
         foreach ($byGroup as $gid => $data) {
