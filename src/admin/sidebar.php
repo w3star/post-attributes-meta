@@ -37,6 +37,12 @@ class Sidebar
      */
     public function enqueue(): void
     {
+        // Nur im Beitrags-Editor laden
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if (! $screen || $screen->base !== 'post' || $screen->post_type !== 'post') {
+            return;
+        }
+
         // Sidebar-Script (unser Panel)
         wp_register_script(
             'owww-sidebar',
@@ -78,7 +84,7 @@ class Sidebar
             }
             $byGroup[$g]['fields'][] = $field;
         }
-        
+
         // Titel einsetzen
         $sections = [];
         foreach ($byGroup as $gid => $data) {
