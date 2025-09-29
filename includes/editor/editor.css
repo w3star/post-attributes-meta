@@ -1,0 +1,14 @@
+/* Inline-Layout für PanelRow */
+.owww-section .components-panel__row {
+    align-items: center;
+}
+
+.owww-fieldlabel {
+    min-width: 140px;
+}
+
+.owww-number-inline .components-input-control__input,
+.owww-number-inline .components-text-control__input {
+    max-width: 120px;
+    /* kompakt */
+}

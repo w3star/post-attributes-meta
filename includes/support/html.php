@@ -2,10 +2,17 @@
 
 namespace OutdoorWww\Support;
 
+
+
 use OutdoorWww\Config\Fields;
 use OutdoorWww\Config\MetaHelper;
 use OutdoorWww\Support\Icons;
 
+
+
+/**
+ * HTML-Hilfsfunktionen
+ */
 final class Html
 {
     public static function iconGroup(string $iconHtml, int $count): string

@@ -67,7 +67,7 @@ class Outdoor_www
         new \OutdoorWww\Meta\Registrar(MetaConfig::defaults(), ['post']);
 
         // 2) Gutenberg-Sidebar (weiterhin deine Sections)
-        new \OutdoorWww\Admin\Sidebar();
+        new \OutdoorWww\Editor\Sidebar();
 
         // 3) Frontend/Editor assets
         new \OutdoorWww\Assets\Registrar();
@@ -88,15 +88,15 @@ new Outdoor_www();
 register_activation_hook(
     __FILE__,
     function () {
-        require_once __DIR__ . '/src/Core/Lifecycle.php';
-        OutdoorWww\Core\Lifecycle::activate();
+        require_once __DIR__ . '/includes/organization/Lifecycle.php';
+        OutdoorWww\Organization\Lifecycle::activate();
     }
 );
 
 register_deactivation_hook(
     __FILE__,
     function () {
-        require_once __DIR__ . '/src/Core/Lifecycle.php';
-        OutdoorWww\Core\Lifecycle::deactivate();
+        require_once __DIR__ . '/includes/organization/Lifecycle.php';
+        OutdoorWww\Organization\Lifecycle::deactivate();
     }
 );

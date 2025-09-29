@@ -2,6 +2,8 @@
 
 namespace OutdoorWww\Support;
 
+
+
 final class Icons
 {
     public static function starFilled(): string
