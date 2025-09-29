@@ -1,61 +1,71 @@
-
-( function( wp ) {
+(function (wp) {
   const { registerPlugin } = wp.plugins;
-  const { PluginDocumentSettingPanel } = wp.editPost;
-  const { useSelect } = wp.data;
-  const { SelectControl, __experimentalNumberControl: NumberControl, TextControl } = wp.components;
-  const { createElement: el, useCallback } = wp.element;
+  const P = wp.editor?.PluginDocumentSettingPanel || wp.editPost.PluginDocumentSettingPanel;
+  const { PanelRow, SelectControl, RangeControl, TextControl, __experimentalNumberControl: NumberControl } = wp.components;
+  const { createElement: h, Fragment } = wp.element;
+  const { useSelect, useDispatch } = wp.data;
 
-  function Panel() {
-    const postType = wp.data.select('core/editor').getCurrentPostType();
-    const meta = useSelect( s => s('core/editor').getEditedPostAttribute('meta') || {}, [] );
-    const editPost = wp.data.dispatch('core/editor').editPost;
-    const savePost = wp.data.dispatch('core/editor').savePost;
+  const PANELS = window.OWWW_PANELS || [];
 
-    if ( postType !== 'post' && postType !== 'page' ) return null;
+  function Field({ field, meta, editMeta }) {
+    const key = field.key, raw = meta[key];
 
-    const setMeta = useCallback((key, value) => {
-      const next = { ...meta, [key]: value };
-      editPost({ meta: next });
-    }, [meta]);
-
-    function handleDifficulty(value){
-      setMeta('owww_difficulty_hiking', value);
+    if (field.widget === 'select') {
+      const opts = (field.options || []).map(o => ({ label: o.label, value: String(o.value) }));
+      return h(PanelRow, null,
+        h(SelectControl, {
+          label: field.label || key,
+          value: String(raw ?? ''),
+          options: opts,
+          onChange: v => editMeta({ [key]: String(v) })
+        })
+      );
     }
 
-    return el( PluginDocumentSettingPanel, { name:'owww-panel', title:'Zusatzinfos', className:'owww-panel' },
-      el( NumberControl, {
-        label: 'Rating (0–5)', min:0, max:5, step:1,
-        value: meta.owww_rating || 0,
-        onChange: v => setMeta('owww_rating', parseInt(v||0,10))
-      } ),
-      el( SelectControl, {
-        label: 'Schwierigkeit',
-        value: meta.owww_difficulty_hiking || '',
-        options: [
-          { label: '—', value: '' },
-          { label: 'Wandern', value: 'T1' },
-          { label: 'Bergwandern', value: 'T2' },
-          { label: 'anspruchsvolles Bergwandern', value: 'T3' },
-          { label: 'Alpinwandern', value: 'T4' },
-          { label: 'anspruchsvolles Alpinwandern', value: 'T5' },
-          { label: 'schwierieges Alpinwandern', value: 'T6' },
-        ],
-        onChange: handleDifficulty,
-        __nextHasNoMarginBottom: true
-      } ),
-      el( NumberControl, {
-        label: 'Exklusivität (0–5)', min:0, max:5, step:1,
-        value: meta.owww_exclusivity || 0,
-        onChange: v => setMeta('owww_exclusivity', parseInt(v||0,10))
-      } ),
-      el( NumberControl, {
-        label: 'Dauer (Minuten)', min:0, step:10,
-        value: meta.owww_time_relaxed || 0,
-        onChange: v => setMeta('owww_time_relaxed', parseInt(v||0,10))
-      } )
+    if (field.type === 'int' && field.widget === 'input') {
+      const Control = NumberControl || TextControl;
+      return h(PanelRow, null,
+        h('span', { className: 'owww-fieldlabel' }, field.label || key),
+        h(Control, {
+          label: undefined,
+          value: raw ?? '',
+          onChange: v => editMeta({ [key]: parseInt(v || 0, 10) || 0 })
+        })
+      );
+    }
+
+    if (field.type === 'int' && field.widget === 'range') {
+      const min = field.min ?? 0, max = field.max ?? 100, step = field.step ?? 1;
+      return h(PanelRow, null,
+        h(RangeControl, {
+          label: field.label || key,
+          value: parseInt(raw || 0, 10) || 0,
+          min, max, step,
+          onChange: v => editMeta({ [key]: parseInt(v || 0, 10) || 0 })
+        })
+      );
+    }
+
+    return h(PanelRow, null,
+      h(TextControl, {
+        label: field.label || key,
+        value: raw ?? '',
+        onChange: v => editMeta({ [key]: v })
+      })
     );
   }
 
-  registerPlugin( 'owww-panel', { render: Panel, icon: 'info' } );
-} )( window.wp );
+  function Panels() {
+    const meta = useSelect(s => s('core/editor').getEditedPostAttribute('meta') || {}, []);
+    const { editPost } = useDispatch('core/editor');
+    const editMeta = patch => editPost({ meta: { ...meta, ...patch } });
+
+    return h(Fragment, null, PANELS.map(p =>
+      h(P, { name: 'owww_' + p.id, title: p.title, className: 'owww-section', key: p.id },
+        p.fields.map(f => h(Field, { field: f, meta, editMeta, key: f.key }))
+      )
+    ));
+  }
+
+  registerPlugin('owww-sidebar-panels', { render: Panels });
+})(window.wp);
